@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Эксплуатация печей АРО</title>
+    <style>
+        /* Базовые настройки */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+        body { background-color: #f4f7fb; color: #1e293b; overflow-x: hidden; }
+
+        /* --- ВЕРХНЯЯ ПАНЕЛЬ --- */
+        .header {
+            position: fixed; top: 0; left: 0; width: 100%; height: 64px;
+            background: #ffffff; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            display: flex; align-items: center; justify-content: space-between; padding: 0 24px; z-index: 100;
+        }
+        .header-left { display: flex; align-items: center; width: 30%; }
+        .menu-btn {
+            background: none; border: none; font-size: 24px; cursor: pointer; 
+            color: #0f172a; margin-right: 20px; transition: color 0.2s;
+        }
+        .menu-btn:hover { color: #0056b3; }
+        
+        .header-title { width: 40%; text-align: center; font-size: 15px; font-weight: 600; color: #475569; letter-spacing: 0.3px; }
+        
+        .header-right { width: 30%; display: flex; justify-content: flex-end; }
+        .home-btn {
+            background: #f1f5f9; border: none; padding: 8px 16px; border-radius: 6px; 
+            cursor: pointer; font-weight: 600; color: #0056b3; transition: background 0.2s;
+            display: none; /* Скрыта на главной странице */
+        }
+        .home-btn:hover { background: #e2e8f0; }
+
+        /* --- БОКОВОЕ МЕНЮ (PREMIUM DESIGN) --- */
+        .sidebar {
+            position: fixed; top: 0; left: -380px; width: 360px; height: 100vh;
+            background: #ffffff; box-shadow: 4px 0 24px rgba(0,0,0,0.08);
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 200; 
+            display: flex; flex-direction: column;
+        }
+        .sidebar.open { left: 0; }
+        
+        .sidebar-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 24px; border-bottom: 1px solid #f1f5f9;
+        }
+        .sidebar-logo { font-size: 18px; font-weight: 700; color: #0056b3; letter-spacing: 0.5px; }
+        .close-btn { 
+            background: none; border: none; font-size: 24px; cursor: pointer; 
+            color: #94a3b8; transition: color 0.2s; line-height: 1;
+        }
+        .close-btn:hover { color: #0f172a; }
+
+        .sidebar-content { padding: 24px; overflow-y: auto; }
+
+        /* Прогресс-бар */
+        .progress-container { margin-bottom: 32px; }
+        .progress-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+        .progress-text { font-size: 13px; font-weight: 600; color: #64748b; }
+        .progress-percent { font-size: 13px; font-weight: 700; color: #0056b3; }
+        .progress-bar { width: 100%; height: 6px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
+        .progress-fill { height: 100%; background: #0056b3; width: 0%; transition: width 0.5s ease; }
+
+        /* Элементы меню */
+        .menu-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+        .menu-item {
+            display: flex; align-items: flex-start; gap: 16px; padding: 12px 16px;
+            border-radius: 8px; cursor: pointer; transition: all 0.2s ease;
+            background: transparent;
+        }
+        .menu-item:hover { background: #f8fafc; transform: translateX(4px); }
+        
+        .menu-circle {
+            flex-shrink: 0; width: 24px; height: 24px; border-radius: 50%;
+            border: 2px solid #cbd5e1; background: #ffffff;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; color: transparent; font-weight: bold;
+            margin-top: 2px; transition: all 0.3s ease;
+        }
+        .menu-item.completed .menu-circle { border-color: #0056b3; background: #0056b3; color: #ffffff; }
+        .menu-text { font-size: 14px; line-height: 1.5; color: #334155; font-weight: 500; }
+        .menu-item.completed .menu-text { color: #94a3b8; }
+
+        /* --- КОНТЕЙНЕРЫ ДЛЯ КОНТЕНТА И IFRAME --- */
+        #main-view { padding-top: 64px; min-height: 100vh; transition: opacity 0.3s; }
+        #course-frame { 
+            display: none; width: 100%; height: calc(100vh - 64px); 
+            border: none; margin-top: 64px; background: #f4f7fb; 
+        }
+
+        /* --- ОБЛОЖКА (HERO) --- */
+        .hero {
+            background: linear-gradient(to bottom, rgba(15, 23, 42, 0.7), rgba(15, 23, 42, 0.9)), url('image/cover-bg.jfif') center/cover;
+            padding: 100px 20px 140px 20px; color: #ffffff; text-align: center;
+        }
+        .hero h1 { font-size: 2.75rem; font-weight: 700; margin-bottom: 20px; line-height: 1.2; }
+        .hero p { font-size: 1.15rem; color: #cbd5e1; max-width: 700px; margin: 0 auto 40px auto; line-height: 1.6; }
+        .stats { display: flex; justify-content: center; gap: 48px; font-size: 1.1rem; font-weight: 600; color: #e2e8f0; }
+        .stat-item { display: flex; align-items: center; gap: 8px; }
+
+        /* --- КАРТОЧКА СОДЕРЖАНИЯ (ГЛАВНАЯ) --- */
+        .content-card {
+            background: #ffffff; max-width: 800px; margin: -80px auto 60px auto;
+            border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            padding: 48px; position: relative; z-index: 10;
+        }
+        .content-card h2 { font-size: 1.5rem; margin-bottom: 32px; color: #0f172a; font-weight: 700; }
+        
+        .main-toc-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+        .main-toc-item {
+            display: flex; align-items: center; gap: 20px; padding: 20px;
+            border-radius: 12px; border: 1px solid #e2e8f0; cursor: pointer; transition: all 0.2s ease;
+        }
+        .main-toc-item:hover { border-color: #cbd5e1; box-shadow: 0 4px 12px rgba(0,0,0,0.03); transform: translateY(-2px); }
+        
+        .main-toc-circle {
+            flex-shrink: 0; width: 32px; height: 32px; border-radius: 50%;
+            border: 2px solid #cbd5e1; display: flex; align-items: center; justify-content: center;
+            font-size: 16px; color: transparent; transition: all 0.3s ease;
+        }
+        .main-toc-item.completed .main-toc-circle { border-color: #0056b3; background: #0056b3; color: #ffffff; }
+        .main-toc-text { font-size: 1.1rem; color: #1e293b; font-weight: 600; }
+        .main-toc-item.completed .main-toc-text { color: #64748b; }
+
+        /* Кнопка */
+        .btn-primary {
+            display: block; width: 100%; background: #0056b3; color: #ffffff;
+            border: none; padding: 18px; font-size: 1.1rem; font-weight: 600;
+            border-radius: 8px; margin-top: 40px; cursor: pointer; transition: all 0.2s ease;
+        }
+        .btn-primary:hover { background: #004494; box-shadow: 0 4px 12px rgba(0, 86, 179, 0.3); }
+    </style>
+</head>
+<body>
+
+    <!-- ВЕРХНЯЯ ПАНЕЛЬ -->
+    <header class="header">
+        <div class="header-left">
+            <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+        </div>
+        <div class="header-title">Эксплуатация печей АРО и защитные атмосферы</div>
+        <div class="header-right">
+            <button class="home-btn" id="home-btn" onclick="showHome()">На главную</button>
+        </div>
+    </header>
+
+    <!-- БОКОВОЕ МЕНЮ -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">НЛМК / ТУОРО</div>
+            <button class="close-btn" onclick="toggleSidebar()">✕</button>
+        </div>
+        
+        <div class="sidebar-content">
+            <div class="progress-container">
+                <div class="progress-header">
+                    <span class="progress-text">Прогресс курса</span>
+                    <span class="progress-percent" id="progress-percent">0%</span>
+                </div>
+                <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+            </div>
+
+            <ul class="menu-list" id="sidebar-menu">
+                <!-- Генерируется через JS -->
+            </ul>
+        </div>
+    </div>
+
+    <!-- ЭКРАН 1: ОБЛОЖКА И СОДЕРЖАНИЕ -->
+    <div id="main-view">
+        <div class="hero">
+            <h1>Эксплуатация печей АРО<br>и работа с защитными атмосферами</h1>
+            <p>Интерактивный курс по регламенту использования газов, устройству оборудования и алгоритмам действий в нештатных ситуациях.</p>
+            <div class="stats">
+                <div class="stat-item">📖 4 модуля</div>
+                <div class="stat-item">🎯 1 тест</div>
+                <div class="stat-item">⏱ 45 минут</div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <h2>Содержание курса</h2>
+            <ul class="main-toc-list" id="main-toc">
+                <!-- Генерируется через JS -->
+            </ul>
+            <button class="btn-primary" onclick="startCourse()">Начать обучение</button>
+        </div>
+    </div>
+
+    <!-- ОКНО ДЛЯ ЗАГРУЗКИ МОДУЛЕЙ (IFRAME) -->
+    <iframe id="course-frame" src=""></iframe>
+
+    <!-- СКРИПТЫ ЛОГИКИ -->
+    <script>
+        // Теперь мы ссылаемся на реальные HTML файлы, а не на ID блоков
+        const courseData = [
+            { id: 1, title: "Модуль 1. Природа газов и защитные атмосферы", completed: false, file: "module1.html" },
+            { id: 2, title: "Модуль 2. Газовое оборудование и обход печи", completed: false, file: "module2.html" },
+            { id: 3, title: "Модуль 3. Контрольно-измерительные приборы", completed: false, file: "module3.html" },
+            { id: 4, title: "Итоговый тест", completed: false, file: "test.html" }
+        ];
+
+        function renderTOC() {
+            const mainToc = document.getElementById('main-toc');
+            const sidebarMenu = document.getElementById('sidebar-menu');
+            mainToc.innerHTML = ''; sidebarMenu.innerHTML = '';
+            
+            let completedCount = 0;
+
+            courseData.forEach(mod => {
+                if (mod.completed) completedCount++;
+                const checkMark = mod.completed ? '✓' : '';
+                const completedClass = mod.completed ? 'completed' : '';
+
+                // Отрисовка для главной карточки
+                mainToc.innerHTML += `
+                    <li class="main-toc-item ${completedClass}" onclick="loadModule('${mod.file}')">
+                        <div class="main-toc-circle">${checkMark}</div>
+                        <div class="main-toc-text">${mod.title}</div>
+                    </li>
+                `;
+
+                // Отрисовка для бокового меню
+                sidebarMenu.innerHTML += `
+                    <li class="menu-item ${completedClass}" onclick="loadModule('${mod.file}'); toggleSidebar();">
+                        <div class="menu-circle">${checkMark}</div>
+                        <div class="menu-text">${mod.title}</div>
+                    </li>
+                `;
+            });
+
+            const percent = Math.round((completedCount / courseData.length) * 100);
+            document.getElementById('progress-percent').innerText = percent + '%';
+            document.getElementById('progress-fill').style.width = percent + '%';
+        }
+
+        // Функция загрузки файла в iframe
+        function loadModule(filename) {
+            document.getElementById('main-view').style.display = 'none';
+            const frame = document.getElementById('course-frame');
+            frame.style.display = 'block';
+            frame.src = filename;
+            
+            // Показываем кнопку "На главную"
+            document.getElementById('home-btn').style.display = 'block';
+            window.scrollTo(0, 0);
+        }
+
+        // Функция возврата на главную страницу
+        function showHome() {
+            document.getElementById('course-frame').style.display = 'none';
+            document.getElementById('course-frame').src = ''; // Очищаем iframe
+            document.getElementById('main-view').style.display = 'block';
+            document.getElementById('home-btn').style.display = 'none';
+        }
+
+        function startCourse() {
+            const nextModule = courseData.find(m => !m.completed);
+            loadModule(nextModule ? nextModule.file : courseData[0].file);
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+
+        // Слушатель сообщений от дочерних страниц (из iframe)
+        window.addEventListener('message', function(event) {
+            if (event.data && event.data.action === 'completeModule') {
+                const mod = courseData.find(m => m.id === event.data.moduleId);
+                if (mod) mod.completed = true;
+                renderTOC(); // Обновляем галочки и проценты
+                showHome();  // Возвращаем пользователя в меню
+            }
+        });
+
+        window.onload = renderTOC;
+    </script>
+</body>
+</html>
