@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Модуль 3: Контрольно-измерительные приборы и автоматика</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f4f7fb; padding: 20px; color: #1e293b; line-height: 1.6; }
+        .lesson-container { max-width: 1000px; margin: 0 auto; background: #ffffff; padding: 40px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+
+        h2 { color: #0f172a; font-size: 2rem; margin-bottom: 24px; border-bottom: 2px solid #e2e8f0; padding-bottom: 12px; }
+        h3 { color: #0f172a; margin: 48px 0 16px 0; font-size: 1.4rem; }
+        h4 { color: #334155; margin: 0 0 12px 0; font-size: 1.2rem; }
+        p { margin-bottom: 16px; font-size: 1.05rem; color: #334155; text-align: justify; }
+        strong { font-weight: 600; color: #0f172a; }
+        ul, ol { margin-bottom: 16px; padding-left: 24px; }
+        li { margin-bottom: 8px; font-size: 1.05rem; color: #334155; }
+
+        /* Плашки */
+        .alert-dark { background: #1e293b; color: #f8fafc; position: relative; padding: 20px 24px 20px 48px; border-radius: 8px; margin: 32px 0 32px 24px; font-size: 1.05rem; line-height: 1.5; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .alert-dark .alert-icon { position: absolute; left: -20px; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; background: #ffffff; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #0f172a; font-weight: bold; font-size: 1.4rem; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .alert-dark strong { color: #94a3b8; display: block; margin-bottom: 8px; font-weight: normal; }
+        .alert-light { background: #f8fafc; border-left: 4px solid #3b82f6; padding: 16px 20px; margin: 24px 0; border-radius: 0 8px 8px 0; color: #1e293b; font-size: 1.05rem; }
+        .alert-danger { background: #fef2f2; border-left: 4px solid #ef4444; padding: 16px 20px; margin: 24px 0; border-radius: 0 8px 8px 0; color: #991b1b; font-size: 1.05rem; }
+
+        /* Фото */
+        .fig-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin: 20px 0; }
+        .fig { margin: 0; }
+        .fig img { width: 100%; aspect-ratio: 4/3; object-fit: cover; border-radius: 10px; cursor: zoom-in; border: 1px solid #e2e8f0; display: block; transition: transform .2s; }
+        .fig img:hover { transform: scale(1.02); }
+        .fig figcaption { font-size: 0.85rem; color: #64748b; text-align: center; margin-top: 6px; }
+        .fig .ph { aspect-ratio: 4/3; border: 2px dashed #cbd5e1; border-radius: 10px; display: flex; align-items: center; justify-content: center; text-align: center; color: #94a3b8; font-size: 0.8rem; padding: 12px; word-break: break-word; }
+
+        /* Посты */
+        .posts { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 20px 0; }
+        .post { border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; background: #f8fafc; }
+        .post h4 { margin-bottom: 8px; font-size: 1.05rem; color: #0056b3; }
+        .post ul { margin: 0; padding-left: 18px; }
+        .post li { font-size: 0.95rem; margin-bottom: 4px; }
+
+        /* Справочник КИП */
+        .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
+        .chip { background: #fff; border: 1px solid #cbd5e1; padding: 7px 14px; border-radius: 20px; cursor: pointer; font-size: 0.9rem; color: #334155; transition: .2s; }
+        .chip.active { background: #0056b3; color: #fff; border-color: #0056b3; }
+        .instr-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+        .instr-card { border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; background: #fff; border-top: 4px solid #3b82f6; }
+        .instr-card[data-cat="flow"] { border-top-color: #eab308; }
+        .instr-card[data-cat="pressure"] { border-top-color: #3b82f6; }
+        .instr-card[data-cat="gas"] { border-top-color: #ef4444; }
+        .instr-card[data-cat="temp"] { border-top-color: #0ea5e9; }
+        .instr-card[data-cat="other"] { border-top-color: #94a3b8; }
+        .instr-card h5 { font-size: 1rem; color: #0f172a; margin-bottom: 4px; }
+        .instr-dev { font-size: 0.85rem; color: #0056b3; font-weight: 600; margin-bottom: 10px; }
+        .instr-row { display: flex; justify-content: space-between; gap: 10px; font-size: 0.88rem; padding: 4px 0; border-bottom: 1px dashed #e2e8f0; }
+        .instr-row:last-child { border-bottom: none; }
+        .instr-row span { color: #64748b; }
+        .instr-row b { text-align: right; color: #0f172a; font-weight: 600; }
+        .instr-norm { margin-top: 10px; background: #ecfdf5; color: #065f46; border-radius: 8px; padding: 6px 10px; font-size: 0.9rem; font-weight: 600; }
+
+        /* Таблица сигнализации */
+        .table-wrap { overflow-x: auto; margin: 20px 0; border-radius: 12px; border: 1px solid #e2e8f0; }
+        table.alarm { width: 100%; border-collapse: collapse; font-size: 0.95rem; min-width: 640px; }
+        table.alarm th { background: #0f172a; color: #fff; text-align: left; padding: 12px; font-weight: 600; }
+        table.alarm td { padding: 10px 12px; border-top: 1px solid #e2e8f0; vertical-align: top; }
+        table.alarm tr:nth-child(even) td { background: #f8fafc; }
+        .tag { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; white-space: nowrap; }
+        .tag.warn { background: #fef3c7; color: #92400e; }
+        .tag.cut { background: #fee2e2; color: #991b1b; }
+
+        /* Автоматика */
+        .auto-wrap { display: grid; grid-template-columns: 300px 1fr; gap: 16px; margin-top: 16px; }
+        .trig-list { display: flex; flex-direction: column; gap: 8px; }
+        .trig-btn { text-align: left; background: #fff; border: 1px solid #e2e8f0; border-left: 4px solid #cbd5e1; padding: 10px 14px; border-radius: 8px; cursor: pointer; font-size: 0.92rem; color: #334155; transition: .2s; }
+        .trig-btn:hover { background: #f8fafc; }
+        .trig-btn.active { border-left-color: #ef4444; background: #fef2f2; color: #0f172a; font-weight: 600; }
+        .auto-detail { border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; background: #fff; }
+        .auto-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+        .meta { background: #f1f5f9; border-radius: 8px; padding: 6px 10px; font-size: 0.85rem; }
+        .meta span { color: #64748b; margin-right: 4px; }
+        .flow-chips { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 8px 0 16px; }
+        .fchip { background: #1e293b; color: #fff; border-radius: 6px; padding: 6px 10px; font-size: 0.85rem; }
+        .farrow { color: #94a3b8; font-weight: 700; }
+        .auto-detail h5 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: .5px; color: #64748b; margin-bottom: 4px; }
+        .auto-detail ol li { font-size: 0.98rem; }
+
+        /* Симулятор пульта */
+        .sim-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-top: 20px; }
+        .pult { background: #1f2937; border-radius: 14px; padding: 18px; box-shadow: inset 0 0 0 4px #374151, 0 8px 20px rgba(0,0,0,.2); }
+        .pult-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; color: #cbd5e1; font-size: 0.9rem; margin-bottom: 14px; }
+        .pult-head b { color: #fff; }
+        .cells { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .cell { background: #0b1220; border: 2px solid #334155; border-radius: 10px; padding: 10px 12px; text-align: left; color: #94a3b8; cursor: default; transition: border-color .2s, box-shadow .2s; font-family: inherit; }
+        .cells.locate .cell { cursor: pointer; }
+        .cells.locate .cell:hover { border-color: #60a5fa; box-shadow: 0 0 0 3px rgba(96,165,250,.3); }
+        .cell .c-name { font-size: 0.78rem; line-height: 1.3; min-height: 2.1em; display: block; }
+        .cell .lcd { font-family: 'Consolas', 'Courier New', monospace; font-size: 1.9rem; color: #4ade80; text-shadow: 0 0 8px rgba(74,222,128,.5); letter-spacing: 1px; display: block; line-height: 1.2; }
+        .cell .c-unit { font-size: 0.75rem; color: #64748b; }
+        .cell .c-norm { display: none; font-size: 0.72rem; color: #fbbf24; margin-top: 2px; }
+        .cells.hinted .c-norm { display: block; }
+        .cell.bad { border-color: #ef4444; box-shadow: 0 0 0 3px rgba(239,68,68,.35); }
+        .cell.bad .lcd { color: #f87171; text-shadow: 0 0 8px rgba(248,113,113,.6); }
+        .cell.good { border-color: #22c55e; }
+        .cell.wrongpick { border-color: #f59e0b; }
+        .pult-ctrl { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+        .btn-norm, .btn-alarm { flex: 1; min-width: 140px; border: none; border-radius: 10px; padding: 16px; font-size: 1.1rem; font-weight: 700; cursor: pointer; color: #fff; text-transform: uppercase; letter-spacing: .5px; box-shadow: 0 4px 0 rgba(0,0,0,.35); }
+        .btn-norm { background: #16a34a; }
+        .btn-alarm { background: #dc2626; }
+        .btn-norm:active, .btn-alarm:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,.35); }
+        .btn-norm:disabled, .btn-alarm:disabled { opacity: .35; cursor: not-allowed; }
+        .sim-msg { margin-top: 16px; background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px 18px; font-size: 1rem; }
+        .sim-msg.ok { border-left: 4px solid #22c55e; }
+        .sim-msg.err { border-left: 4px solid #ef4444; }
+        .sim-msg.info { border-left: 4px solid #3b82f6; }
+        .act-list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+        .act-opt { text-align: left; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px 14px; cursor: pointer; font-size: 0.97rem; color: #1e293b; }
+        .act-opt:hover { background: #eff6ff; border-color: #3b82f6; }
+        .act-opt.right { background: #dcfce7; border-color: #22c55e; }
+        .act-opt.wrong { background: #fee2e2; border-color: #ef4444; }
+        .sim-tools { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+        .small-btn { background: #fff; border: 1px solid #cbd5e1; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 0.9rem; color: #334155; }
+        .small-btn:hover { background: #f1f5f9; }
+        .next-btn { background: #0056b3; color: #fff; border: none; padding: 12px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: 12px; }
+        .score-dots { display: flex; gap: 6px; flex-wrap: wrap; }
+        .score-dots i { width: 14px; height: 14px; border-radius: 50%; background: #475569; display: inline-block; }
+        .score-dots i.ok { background: #22c55e; }
+        .score-dots i.err { background: #ef4444; }
+        .score-dots i.cur { background: #fbbf24; }
+
+        /* Тест */
+        .quiz { margin-top: 16px; display: flex; flex-direction: column; gap: 16px; }
+        .q-card { border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; }
+        .q-card.ok { border-color: #34d399; background: #f0fdf4; }
+        .q-card.bad { border-color: #f87171; background: #fef2f2; }
+        .q-title { font-weight: 600; margin-bottom: 12px; color: #0f172a; }
+        .q-opt { display: flex; gap: 10px; align-items: flex-start; padding: 8px 12px; border-radius: 8px; cursor: pointer; }
+        .q-opt:hover { background: #f1f5f9; }
+        .q-opt input { margin-top: 6px; accent-color: #0056b3; }
+        .q-exp { display: none; margin-top: 10px; font-size: 0.95rem; color: #334155; }
+        .q-card.ok .q-exp, .q-card.bad .q-exp { display: block; }
+        .quiz-result { font-weight: 600; margin-top: 8px; }
+
+        /* Кнопки завершения */
+        .btn-group { display: flex; flex-direction: column; gap: 12px; margin-top: 32px; }
+        .check-btn { background: #0056b3; color: #fff; border: none; padding: 14px 24px; font-size: 1rem; font-weight: 600; border-radius: 8px; cursor: pointer; }
+        .nav-btn { background: #10b981; color: white; border: none; padding: 18px 32px; font-size: 1.1rem; font-weight: bold; border-radius: 8px; cursor: pointer; width: 100%; text-transform: uppercase; display: none; }
+        .nav-btn:hover { background: #059669; }
+        .reset-btn { background: transparent; color: #64748b; border: 1px solid #cbd5e1; padding: 12px 24px; font-size: 1rem; border-radius: 8px; cursor: pointer; width: 100%; display: none; }
+        .reset-btn:hover { background: #f1f5f9; color: #1e293b; }
+        .disabled-text { text-align: center; color: #94a3b8; font-size: 1rem; margin-top: 24px; padding: 16px; background: #f1f5f9; border-radius: 8px; }
+
+        /* Лайтбокс */
+        .lightbox { position: fixed; inset: 0; background: rgba(15,23,42,.9); display: none; align-items: center; justify-content: center; z-index: 1000; cursor: zoom-out; padding: 20px; }
+        .lightbox.open { display: flex; }
+        .lightbox img { max-width: 100%; max-height: 90vh; border-radius: 8px; }
+
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .lesson-container { padding: 20px; }
+            .alert-dark { margin-left: 16px; padding-left: 36px; }
+            .alert-dark .alert-icon { left: -16px; width: 32px; height: 32px; font-size: 1.2rem; }
+            .auto-wrap { grid-template-columns: 1fr; }
+            .cells { grid-template-columns: repeat(2, 1fr); }
+            .cell .lcd { font-size: 1.5rem; }
+            .sim-box { padding: 14px; }
+        }
+    </style>
+</head>
+<body>
+<div class="lesson-container">
+
+    <h2>Контрольно-измерительные приборы и автоматика</h2>
+    <p>Безопасная работа башенной печи с защитными атмосферами невозможна без постоянного контроля приборов. В этом модуле вы научитесь находить нужный прибор, считывать его показания, сравнивать их с допустимыми значениями и понимать, что делает автоматика безопасности — и что в этот момент должен сделать термист.</p>
+
+    <div class="alert-dark">
+        <div class="alert-icon">!</div>
+        <strong>Главное правило:</strong>
+        работа приборов, показывающих и регистрирующих параметры печи, не должна прерываться в процессе её эксплуатации. Каждый случай срабатывания аварийной сигнализации и продувки печи термист отмечает в сменном рапорте.
+    </div>
+
+    <!-- 1. ГДЕ ПРИБОРЫ -->
+    <h3>1. Где расположены приборы</h3>
+    <p>Управление температурным и газовым режимами печи осуществляется с <strong>теплового щита</strong>. Контроль температуры, влаги и расхода АЗГ по камерам ведётся по приборам «Термодат» и на мониторе компьютера; регулирование температуры по зонам — регуляторами «Термодат». Регулирующие клапаны на трубопроводах АЗГ управляются с теплового щита дистанционно в ручном или автоматическом режиме.</p>
+
+    <div class="posts">
+        <div class="post">
+            <h4>Тепловой щит</h4>
+            <ul>
+                <li>температура в зонах КН, КВ и охлаждения, сигнализация её превышения;</li>
+                <li>общий расход АЗГ и расход по камерам (КН, КВ, КУО);</li>
+                <li>давление АЗГ перед печью и давление в камерах;</li>
+                <li>влажность печной атмосферы;</li>
+                <li>водород в АЗГ и в камерах, кислород в КН и КУО, CO в КН и КВ;</li>
+                <li>водород в воздухе (СВК), давление азота / воздуха на КИПиА;</li>
+                <li>температура в увлажнителе и увлажнённого АЗГ, скорость полосы.</li>
+            </ul>
+        </div>
+        <div class="post">
+            <h4>Пост управления №1</h4>
+            <ul><li>приборы контроля температуры обезжиривающих растворов и воды (норма — более 80 °C).</li></ul>
+            <h4 style="margin-top:12px">Пост управления №2</h4>
+            <ul>
+                <li>задатчик скорости полосы и её измерение в головной, средней и хвостовой частях;</li>
+                <li>измерение нагрузки электроприводов оборудования.</li>
+            </ul>
+        </div>
+    </div>
+    <div class="fig-row" data-imgs="panel|screen|zones|transport"></div>
+
+    <!-- 2. СПРАВОЧНИК -->
+    <h3>2. Справочник средств измерений</h3>
+    <p>Ниже — приборы из Приложения Б инструкции по эксплуатации АРО-1,2. У каждого указаны диапазон, погрешность, место установки и допустимое значение контролируемого параметра. Используйте фильтр, чтобы быстро найти нужную группу.</p>
+    <div class="chips" id="instr-chips"></div>
+    <div class="instr-grid" id="instr-grid"></div>
+
+    <div class="alert-light">
+        <strong>Допустимое значение и уставка сигнализации — не одно и то же.</strong> Например, допустимое содержание кислорода в КН и КУО — 0,2 %, а световая и звуковая сигнализация срабатывает при превышении 0,5 %. Отклонение за допустимое значение — повод разобраться, не дожидаясь сигнала.
+    </div>
+
+    <!-- 3. СИГНАЛИЗАЦИЯ -->
+    <h3>3. Сигнализация и защита</h3>
+    <p>Аварийная свето-звуковая сигнализация предупреждает о выходе параметров за пределы, а часть сигналов автоматически запускает <strong>аварийную отсечку водорода и АЗГ с продувкой печи продувочным (газгольдерным) азотом</strong>.</p>
+    <div class="table-wrap">
+        <table class="alarm">
+            <thead><tr><th>Параметр</th><th>Устройство</th><th>Уставка</th><th>Что происходит</th></tr></thead>
+            <tbody id="alarm-body"></tbody>
+        </table>
+    </div>
+
+    <h4>Сигнализатор взрывоопасных концентраций (СВК)</h4>
+    <p>Сигнализатор СВК3М контролирует содержание водорода в воздухе. Отбор проб производится <strong>над камерой нагрева и под фермой над печами АРО-1,2</strong>. Быстродействие сигнализатора — не более 30 секунд. Концентрация водорода в воздухе не должна превышать <strong>0,8 % объёмных — это 20 % от нижнего предела взрываемости водорода (4 %)</strong>. При поступлении сигнала необходимо принять меры по выявлению мест утечек и их устранению.</p>
+
+    <h4>Газоанализаторы</h4>
+    <ul>
+        <li><strong>ГТВ-1101</strong> — водород в АЗГ и в камерах нагрева, выдержки и охлаждения;</li>
+        <li><strong>ГТМ5501</strong> — кислород в камере нагрева и в камере ускоренного охлаждения;</li>
+        <li><strong>Гамма 100</strong> — окись углерода в камерах нагрева и выдержки;</li>
+        <li><strong>СГГ-20 микро</strong> — переносной газоанализатор водорода (0–2,4 %, погрешность ±0,2 %). При содержании водорода в КРО более 2 % увеличивают подачу АЗГ на камеру ускоренного охлаждения.</li>
+    </ul>
+
+    <h4>Сигнализация водяного охлаждения и индуктора</h4>
+    <p>При понижении допустимого уровня воды в расширительном баке на подаче воды в кессоны и переходной тамбур срабатывает звуковая и световая сигнализация. Проток и температура воды кессонов №1, №2, №3 и на выходе также контролируются, при превышении допустимых значений срабатывает звуковая сигнализация. На нижних крышках кессонов подключена сигнализация обрыва полосы.</p>
+    <div class="fig-row" data-imgs="levelAlarm|expTank|breakAlarm|indMonitor|pyro"></div>
+
+    <!-- 4. АВТОМАТИКА -->
+    <h3>4. Что делает автоматика — и что делаете вы</h3>
+    <p>Выберите событие слева: вы увидите, какой прибор его фиксирует, как отрабатывает автоматика и какие действия обязан выполнить термист проката и труб 5, 7 разряда.</p>
+    <div class="auto-wrap">
+        <div class="trig-list" id="trig-list"></div>
+        <div class="auto-detail" id="auto-detail"></div>
+    </div>
+
+    <div class="alert-danger">
+        В любой ситуации, которая не описана в производственной инструкции и в плане мероприятий по локализации и ликвидации последствий аварий, самостоятельные действия предпринимать запрещается — сообщите мастеру и выполняйте работу только по его указаниям.
+    </div>
+
+    <!-- 5. СИМУЛЯТОР -->
+    <h3>5. Тренажёр: пульт оператора</h3>
+    <p>Перед вами упрощённый пульт теплового щита. Показания меняются в реальном времени. Оцените все параметры и решите:</p>
+    <ol>
+        <li><strong>«Норма»</strong> — все показания в допустимых пределах;</li>
+        <li><strong>«Тревога»</strong> — есть отклонение. Тогда укажите прибор с отклонением и выберите правильное действие.</li>
+    </ol>
+    <p>Всего 10 раундов. Для прохождения нужно правильно решить не менее 8. Раунд, в котором вы открыли подсказку с нормами, не засчитывается.</p>
+
+    <div class="sim-box">
+        <div class="pult">
+            <div class="pult-head">
+                <div>Тепловой щит АРО · <b id="sim-round">Раунд 1 из 10</b></div>
+                <div class="score-dots" id="sim-dots"></div>
+            </div>
+            <div class="cells" id="cells"></div>
+            <div class="pult-ctrl">
+                <button class="btn-norm" id="btn-norm" onclick="decide(false)">✔ Норма</button>
+                <button class="btn-alarm" id="btn-alarm" onclick="decide(true)">⚠ Тревога</button>
+            </div>
+        </div>
+        <div class="sim-tools">
+            <button class="small-btn" id="hint-btn" onclick="showNorms()">💡 Показать нормы (раунд не засчитается)</button>
+            <button class="small-btn" onclick="startSim()">↺ Начать тренажёр заново</button>
+        </div>
+        <div class="sim-msg info" id="sim-msg">Оцените показания и нажмите «Норма» или «Тревога».</div>
+    </div>
+
+    <!-- 6. ТЕСТ -->
+    <h3>6. Контрольные вопросы</h3>
+    <div class="quiz" id="quiz"></div>
+    <div class="btn-group" style="margin-top:16px">
+        <button class="check-btn" id="quiz-check" onclick="checkQuiz()">Проверить ответы</button>
+    </div>
+    <div class="quiz-result" id="quiz-result"></div>
+
+    <div id="disabled-msg" class="disabled-text">🔒 Пройдите тренажёр (не менее 8 из 10) и ответьте на все вопросы, чтобы перейти к итоговому тесту</div>
+    <div class="btn-group">
+        <button id="next-module-btn" class="nav-btn" onclick="goNext()">Перейти к модулю 4 ➔</button>
+        <button id="reset-btn" class="reset-btn" onclick="resetModule()">Пройти модуль ещё раз</button>
+    </div>
+</div>
+
+<div class="lightbox" id="lightbox" onclick="this.classList.remove('open')"><img id="lightbox-img" alt=""></div>
+
+<script>
+/* ================== КАРТИНКИ ================== */
+const IMG_DIR = 'image/';
+const IMG = {
+    screen:     '1774506747181 илюстрация',
+    zones:      'зоны печи_илюстрация',
+    indMonitor: 'монитор параметрами работы индуктора илюстрации',
+    pyro:       'пирометр индуктора илюстрация',
+    breakAlarm: 'подключение сигнализации на обыв полосы на нижних крышках кессонов илюстрация',
+    transport:  'пост управления транспортом печи илюстрация',
+    expTank:    'расширительный бак на подпитку кессонов илюстрация',
+    levelAlarm: 'сигнализация уровня воды в кессонах илюстрация',
+    panel:      'тепловой щит с приборами илюстрация'
+};
+const CAPTIONS = {
+    screen:     'Экран параметров печи',
+    zones:      'Зоны печи на мониторе',
+    breakAlarm: 'Сигнализация на обрыв полосы на нижних крышках кессонов',
+    indMonitor: 'Монитор параметров работы индуктора',
+    transport:  'Пост управления транспортом печи',
+    panel:      'Тепловой щит с приборами'
+};
+const IMG_EXT = ['.png', '.PNG', '.jpg'];
+function imgVariants(name) {
+    const base = new Set();
+    [name, name.replace(/ил+юстрац/g, 'иллюстрац'), name.replace(/ил+юстрац/g, 'илюстрац')].forEach(v => {
+        base.add(v);
+        base.add(v.replace(/\s{2,}/g, ' '));
+    });
+    const out = [];
+    base.forEach(v => {
+        [v.normalize('NFC'), v.normalize('NFD')].forEach(n => {
+            IMG_EXT.forEach(ext => {
+                const src = IMG_DIR + encodeURIComponent(n) + ext;
+                if (!out.includes(src)) out.push(src);
+            });
+        });
+    });
+    return out;
+}
+function cap(key) {
+    if (CAPTIONS[key]) return CAPTIONS[key];
+    const s = IMG[key].replace(/[_\s]*ил+юстрац[а-яё]*\s*$/i, '').replace(/\s{2,}/g, ' ').trim();
+    return s.charAt(0).toUpperCase() + s.slice(1);
+}
+function figHTML(key) {
+    if (!IMG[key]) return '';
+    return `<figure class="fig" data-key="${key}"><img src="${imgVariants(IMG[key])[0]}" data-try="0" alt="${cap(key)}" loading="lazy" onerror="imgFail(this)" onclick="openLightbox(this)"><figcaption>${cap(key)}</figcaption></figure>`;
+}
+function imgFail(el) {
+    const f = el.closest('figure');
+    const list = imgVariants(IMG[f.dataset.key]);
+    const next = (+el.dataset.try || 0) + 1;
+    if (next < list.length) { el.dataset.try = next; el.src = list[next]; return; }
+    el.remove();
+    f.insertAdjacentHTML('afterbegin', `<div class="ph">🖼 Нет файла:<br>${IMG_DIR}${IMG[f.dataset.key]}.png</div>`);
+}
+function openLightbox(el) {
+    document.getElementById('lightbox-img').src = el.src;
+    document.getElementById('lightbox').classList.add('open');
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') document.getElementById('lightbox').classList.remove('open'); });
+
+const store = {
+    get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+    set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} },
+    del(k) { try { localStorage.removeItem(k); } catch (e) {} }
+};
+const shuffle = a => { const r = [...a]; for (let i = r.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [r[i], r[j]] = [r[j], r[i]]; } return r; };
+const rnd = (a, b) => a + Math.random() * (b - a);
+
+/* ================== СПРАВОЧНИК КИП (ИЭ, Приложение Б) ================== */
+const CATS = [['all', 'Все'], ['flow', 'Расход'], ['pressure', 'Давление'], ['gas', 'Анализ газа'], ['temp', 'Температура и влажность'], ['other', 'Прочее']];
+const INSTR = [
+    { cat: 'pressure', name: 'Давление на поду печи', dev: 'Метран 150М + Термодат 13К2', range: '0–15 мм вод. ст.', acc: '0,5 %', place: 'Щит КИП', norm: 'не менее 1,5 мм вод. ст.' },
+    { cat: 'pressure', name: 'Давление азота / сжатого воздуха на питание КИПиА', dev: 'ЭКМ', range: '0–6 кгс/см²', acc: '1,5 %', place: 'Щит КИП', norm: '2,0 кгс/см²; ниже — аварийная отсечка' },
+    { cat: 'flow', name: 'Общий расход АЗГ на печь', dev: 'Метран 150М + Термодат 13К2', range: '0–2500 м³/ч', acc: '4,0 %', place: 'Щит КИП', norm: '1200–1700 м³/ч' },
+    { cat: 'flow', name: 'Расход АЗГ на камеру нагрева', dev: 'Метран 150М + Термодат 13К2', range: '0–500 м³/ч', acc: '4,0 %', place: 'Щит КИП', norm: '0–100 м³/ч' },
+    { cat: 'flow', name: 'Расход АЗГ на камеру выдержки', dev: 'Метран 150М + Термодат 13К2', range: '0–630 м³/ч', acc: '0,5 %', place: 'Щит КИП', norm: '200–400 м³/ч' },
+    { cat: 'flow', name: 'Расход АЗГ на камеру ускоренного охлаждения', dev: 'Метран 150М + Термодат 13К2', range: '0–1250 м³/ч', acc: '0,5 %', place: 'Щит КИП', norm: '1000–1200 м³/ч' },
+    { cat: 'gas', name: 'Водород в азотном защитном газе', dev: 'ГТВ-1101 + Термодат 13К2', range: '0–10 %', acc: '0,5 %', place: 'Щит КИП', norm: '5,0–5,5 % (не более 7 %)' },
+    { cat: 'gas', name: 'Водород в камерах нагрева, выдержки и охлаждения', dev: 'ГТВ-1101 + Термодат 13К2', range: '0–10 %', acc: '0,5 %', place: 'Щит КИП', norm: '5,0–8,0 %' },
+    { cat: 'gas', name: 'Кислород в камере нагрева и КУО', dev: 'ГТМ5501 + Термодат 13К2', range: '0–1,0 %', acc: '0,5 %', place: 'Щит КИП', norm: '0,2 % (сигнализация > 0,5 %)' },
+    { cat: 'gas', name: 'Окись углерода в камерах нагрева и выдержки', dev: 'Гамма 100', range: '0–2,0 %', acc: '±2 %', place: 'Щит КИП', norm: '1,0–2,0 %' },
+    { cat: 'gas', name: 'Водород в воздухе', dev: 'Сигнализатор СВК3М', range: 'быстродействие ≤ 30 с', acc: '—', place: 'Щит КИП', norm: 'не более 0,8 %' },
+    { cat: 'gas', name: 'Водород в КРО (контрольный анализ)', dev: 'СГГ-20 микро (переносной)', range: '0–2,4 %', acc: '±0,2 %', place: 'Переносной', norm: 'более 2 % — увеличить АЗГ на КУО' },
+    { cat: 'temp', name: 'Влажность печной атмосферы в камерах', dev: 'ДВ-2М + Термодат 13К2', range: '0–60 г/м³', acc: '2,5 %', place: 'Щит КИП', norm: '6–25 г/м³' },
+    { cat: 'temp', name: 'Температура в зонах камеры нагрева', dev: 'ТХА + Термодат 13К2', range: '20–1300 °C', acc: 'класс допуска 2', place: 'Щит КИП', norm: '790–850 °C' },
+    { cat: 'temp', name: 'Температура в зонах камер выдержки и охлаждения', dev: 'ТХА + Термодат 13К2', range: '20–1300 °C', acc: 'класс допуска 2', place: 'Щит КИП', norm: '800–850 °C' },
+    { cat: 'temp', name: 'Температура воды в увлажнителе газа', dev: 'ТСМ 50М + Термодат 19К2', range: '0–150 °C', acc: 'класс допуска А', place: 'Щит КИП', norm: '35–55 °C' },
+    { cat: 'temp', name: 'Температура увлажнённого АЗГ после газоподогревателя', dev: 'ТСМ 50М + Термодат 19К2', range: '0–150 °C', acc: '0,5 %', place: 'Щит КИП', norm: '50 °C' },
+    { cat: 'other', name: 'Скорость полосы', dev: 'Тахогенератор Диск 250', range: '0–60 м/мин', acc: '0,5 %', place: 'Щит КИП', norm: '0–35 м/мин' },
+    { cat: 'other', name: 'Состояние подшипников, узлов трения, муфт', dev: 'Пирометр ADA TemPro 900', range: '−50…+900 °C', acc: '±3 °C', place: 'Переносной, у механика ЦРО', norm: 'не более 70 °C' }
+];
+let curCat = 'all';
+function renderInstr() {
+    document.getElementById('instr-chips').innerHTML = CATS.map(([id, t]) =>
+        `<button class="chip${id === curCat ? ' active' : ''}" onclick="setCat('${id}')">${t}</button>`).join('');
+    document.getElementById('instr-grid').innerHTML = INSTR.filter(i => curCat === 'all' || i.cat === curCat).map(i => `
+        <div class="instr-card" data-cat="${i.cat}">
+            <h5>${i.name}</h5>
+            <div class="instr-dev">${i.dev}</div>
+            <div class="instr-row"><span>Диапазон</span><b>${i.range}</b></div>
+            <div class="instr-row"><span>Погрешность</span><b>${i.acc}</b></div>
+            <div class="instr-row"><span>Место</span><b>${i.place}</b></div>
+            <div class="instr-norm">Норма: ${i.norm}</div>
+        </div>`).join('');
+}
+function setCat(c) { curCat = c; renderInstr(); }
+
+/* ================== ТАБЛИЦА СИГНАЛИЗАЦИИ ================== */
+const ALARMS = [
+    ['Давление в камере ускоренного охлаждения', 'Световая лампа, звонок', '3 мм вод. ст.', 'warn', 'Предупредительный сигнал падения давления'],
+    ['Давление в камерах печи', 'Сирена, лампа', 'ниже 2 мм вод. ст.', 'cut', 'Отсечка H₂ и АЗГ, продувка азотом'],
+    ['Кислород в КН и камере охлаждения', 'ГТМ, лампа, звонок', '> 0,5 %', 'warn', 'Свето-звуковой сигнал'],
+    ['Водород в камере охлаждения (КРО/КУО)', 'ГТВ, лампа, звонок', '> 9 %', 'cut', 'Отсечка H₂ и АЗГ, продувка азотом'],
+    ['Давление азота / сжатого воздуха на КИПиА', 'Манометр ЭКМ, лампа, звонок', 'ниже 2 кгс/см² (0,2 МПа)', 'cut', 'Отсечка H₂ и АЗГ, продувка азотом'],
+    ['Напряжение на щите КИПиА', 'Клапан ЭПК', 'отсутствие напряжения', 'cut', 'Отсечка H₂ и АЗГ, продувка азотом'],
+    ['Расход АЗГ на КУО', 'Сирена, лампа', 'менее 600 м³/ч', 'cut', 'Отсечка H₂ и АЗГ, продувка азотом'],
+    ['Давление водорода на узле редуцирования', 'Лампа, клапан ПКН', 'падение давления', 'cut', 'ПКН отсекает водород от печи'],
+    ['Водород в воздухе пролёта', 'Сигнализатор СВК', '> 0,8 %', 'warn', 'Свето-звуковой сигнал'],
+    ['Уровень воды в расширительном баке кессонов', 'Свето-звуковая сигнализация', 'ниже допустимого', 'warn', 'Свето-звуковой сигнал'],
+    ['Проток и температура воды кессонов №1–3 и на выходе', 'Звуковая сигнализация', 'выше допустимого', 'warn', 'Звуковой сигнал']
+];
+function renderAlarms() {
+    document.getElementById('alarm-body').innerHTML = ALARMS.map(a =>
+        `<tr><td>${a[0]}</td><td>${a[1]}</td><td><b>${a[2]}</b></td><td><span class="tag ${a[3]}">${a[3] === 'cut' ? 'АВТОМАТИКА' : 'СИГНАЛ'}</span> ${a[4]}</td></tr>`).join('');
+}
+
+/* ================== АВТОМАТИКА (ПИ п.4.3–4.12) ================== */
+const PURGE = ['Сирена', 'Сигнальная лампа', 'Отсечка H₂ и АЗГ', 'Продувка печи азотом'];
+const AUTO = [
+    { name: 'Предварительное падение давления в КУО', dev: 'Давление в КУО', set: '3 мм вод. ст.', ref: 'ПИ п.4.3–4.5',
+      auto: ['Сирена', 'Сигнальная лампа'],
+      steps: ['Дистанционно с теплового щита увеличить подачу АЗГ в камеру ускоренного охлаждения.',
+              'Если давление не восстанавливается до 3–6 мм вод. ст. — увеличить подачу АЗГ в камеру нагрева.',
+              'Если и это не помогло — прикрыть регулирующий орган технологической свечи (минимальная степень открытия — 10 %) и искать причину падения давления.',
+              'Если причина не выявлена и не устранена — отсечь водород и продуть печные газопроводы, увлажнитель и печь до полного вытеснения водорода.'] },
+    { name: 'Аварийное падение давления в камерах', dev: 'Давление в камерах', set: 'ниже 2 мм вод. ст.', ref: 'ПИ п.4.6',
+      auto: PURGE,
+      steps: ['Убедиться в срабатывании клапана ОК1АГ на газопроводе газгольдерного азота; если клапан не открылся — срочно открыть задвижку байпаса 5АГ.',
+              'Проверить давление АЗГ на подводе к печи и исправность клапанов и задвижек на газопроводе АЗГ.',
+              'Если давление АЗГ нормальное и арматура исправна — прекратить аварийную продувку: ключ «УП» в положение «Д», кнопки «КПП» и «ПУСК АЗОТА», и продолжать продувку печи АЗГ.',
+              'При недостаточном давлении АЗГ — продолжать продувку продувочным азотом до содержания водорода в печи не более 5 %, затем прекратить её кнопкой «КПП».'] },
+    { name: 'Водород в камере охлаждения более 9 %', dev: 'Газоанализатор ГТВ', set: '> 9 %', ref: 'ПИ п.4.7',
+      auto: PURGE,
+      steps: ['Убедиться в срабатывании клапана ОК1АГ.',
+              'Проверить герметичность камер регулируемого и ускоренного охлаждения, состояние выходного затвора и степень открытия регулирующего органа технологической свечи.',
+              'Проверить газопровод и арматуру подачи азотного газа в КУО, после чего прекратить аварийную продувку кнопками «КПП» и «ПУСК АЗОТА».',
+              'Следить по газоанализатору водорода в КРО за устранением обратного перетока, при необходимости увеличить подачу азотного газа к КУО.',
+              'После устранения перетока подать водород в печь по п.3.3.4–3.3.8 ПИ.'] },
+    { name: 'Расход АЗГ на КУО менее 600 м³/ч', dev: 'Расходомер АЗГ на КУО', set: '< 600 м³/ч', ref: 'ПИ п.4.8',
+      auto: PURGE,
+      steps: ['Дистанционно с теплового щита полностью открыть клапан 6.',
+              'Проверить исправность запорно-регулирующей арматуры линии подачи АЗГ на КУО и системы управления клапаном 6.',
+              'После устранения причин прекратить аварийную продувку, убедиться в нормальной подаче азотного газа на КУО и подать водород в печь.'] },
+    { name: 'Прекращение подачи электроэнергии', dev: 'Клапан ЭПК', set: 'нет напряжения', ref: 'ПИ п.4.9',
+      auto: ['Отсечка H₂ и АЗГ', 'Продувка печи азотом'],
+      steps: ['Перекрыть газопровод водорода.',
+              'Если подача электроэнергии не возобновляется — продолжать аварийную продувку до полного вытеснения водорода из печи.',
+              'С возобновлением подачи электроэнергии подать в печь АЗГ и водород.'] },
+    { name: 'Падение давления сжатого воздуха на КИП', dev: 'Манометр ЭКМ', set: '< 2 кгс/см²', ref: 'ПИ п.4.10',
+      auto: PURGE,
+      steps: ['Убедиться в срабатывании отсечного клапана ОК1АГ; при его неисправности открыть задвижку 5АГ на байпасе.',
+              'Перекрыть линию водорода и продолжать аварийную продувку до полного вытеснения водорода.',
+              'С восстановлением давления сжатого воздуха прекратить аварийную продувку и подать в печь АЗГ и водород.'] },
+    { name: 'Падение давления водорода на узле редуцирования', dev: 'Узел редуцирования', set: 'падение давления', ref: 'ПИ п.4.11',
+      auto: ['Сигнальная лампа', 'ПКН отсекает водород'],
+      steps: ['Связаться с мастером (сменным) УПГ и выяснить причины падения давления водорода.',
+              'При длительном невосстановлении давления — продуть печь АЗГ, ключ «УП» перевести в положение «Д», перекрыть газопровод водорода.',
+              'При быстром восстановлении — пустить водород в печь по п.3.3.4–3.3.8 ПИ и восстановить параметры газового режима.'] },
+    { name: 'Падение давления АЗГ', dev: 'Давление АЗГ перед печью', set: 'падение давления', ref: 'ПИ п.4.12',
+      auto: PURGE,
+      steps: ['Связаться с мастером (сменным) УПГ и выяснить причины падения давления АЗГ.',
+              'При длительном отсутствии давления — перекрыть газопровод водорода и продолжать аварийную продувку до полного вытеснения водорода.',
+              'При быстром восстановлении — ключ «УП» в положение «Д», прекратить продувку кнопкой «КПП», пустить АЗГ кнопкой «ПУСК АЗОТА», убедиться в подаче АЗГ во все камеры и работе регулятора давления, затем подать водород.'] },
+    { name: 'Водород в воздухе выше 0,8 % (СВК)', dev: 'Сигнализатор СВК', set: '> 0,8 %', ref: 'ПИ п.1.7.1–1.7.2',
+      auto: ['Звуковой сигнал', 'Световой сигнал'],
+      steps: ['Сообщить мастеру (сменному) ТУОРО.',
+              'Принять меры по выявлению мест утечек — проверять только мыльным раствором.',
+              'Устранить утечку; при развитии аварийной ситуации действовать по ПМЛиЛПА.'] }
+];
+let curAuto = 0;
+function renderAuto() {
+    document.getElementById('trig-list').innerHTML = AUTO.map((a, i) =>
+        `<button class="trig-btn${i === curAuto ? ' active' : ''}" onclick="setAuto(${i})">${a.name}</button>`).join('');
+    const a = AUTO[curAuto];
+    document.getElementById('auto-detail').innerHTML = `
+        <h4>${a.name}</h4>
+        <div class="auto-meta">
+            <div class="meta"><span>Контроль:</span>${a.dev}</div>
+            <div class="meta"><span>Уставка:</span><b>${a.set}</b></div>
+            <div class="meta"><span>Документ:</span>${a.ref}</div>
+        </div>
+        <h5>Автоматика</h5>
+        <div class="flow-chips">${a.auto.map(x => `<span class="fchip">${x}</span>`).join('<span class="farrow">→</span>')}</div>
+        <h5>Действия термиста</h5>
+        <ol>${a.steps.map(s => `<li>${s}</li>`).join('')}</ol>`;
+}
+function setAuto(i) { curAuto = i; renderAuto(); }
+
+/* ================== ТРЕНАЖЁР ПУЛЬТА ================== */
+const PARAMS = [
+    { id: 'p',  name: 'Давление на поду', unit: 'мм вод. ст.', d: 1, norm: [3, 7],       ref: '1,5–10' },
+    { id: 'q',  name: 'Общий расход АЗГ', unit: 'м³/ч',        d: 0, norm: [1300, 1600], ref: '1200–1700' },
+    { id: 'qk', name: 'Расход АЗГ на КУО', unit: 'м³/ч',       d: 0, norm: [1030, 1170], ref: '1000–1200' },
+    { id: 'h',  name: 'H₂ в АЗГ',          unit: '%',          d: 2, norm: [5.05, 5.4],  ref: '5,0–5,5' },
+    { id: 'hc', name: 'H₂ в камерах',      unit: '%',          d: 1, norm: [5.4, 7.5],   ref: '5,0–8,0' },
+    { id: 'o',  name: 'O₂ в КН / КУО',     unit: '%',          d: 2, norm: [0.03, 0.15], ref: '≤ 0,2 (сигнал > 0,5)' },
+    { id: 'w',  name: 'Влажность в КВ',    unit: 'г/м³',       d: 1, norm: [12, 22],     ref: '6–25' },
+    { id: 't',  name: 'T воды в увлажнителе', unit: '°C',      d: 0, norm: [40, 52],     ref: '35–55' },
+    { id: 's',  name: 'H₂ в воздухе (СВК)', unit: '%',         d: 2, norm: [0.0, 0.12],  ref: '< 0,8' }
+];
+const FAULTS = [
+    { p: 'p', range: [0.9, 1.3], title: 'Давление на поду ниже 1,5 мм вод. ст.',
+      ok: 'Проверить давление АЗГ перед печью и расходомеры по камерам; если давление не восстанавливается — увеличить расход АЗГ на КУО до 1000–1100 м³/ч и найти неплотности',
+      bad: ['Полностью открыть технологическую свечу', 'Прекратить подачу АЗГ в печь'], ref: 'ИЭ п.2.3.4.4' },
+    { p: 'q', range: [1040, 1150], title: 'Общий расход АЗГ ниже 1200 м³/ч',
+      ok: 'Проверить показания расходомеров по камерам печи и восстановить расход газа с теплового щита',
+      bad: ['Уменьшить расход на КУО, чтобы выровнять баланс', 'Открыть технологическую свечу на 100 %'], ref: 'ИЭ п.2.3.4.4, Прил. Б' },
+    { p: 'qk', range: [540, 590], title: 'Расход АЗГ на КУО ниже 600 м³/ч — срабатывает аварийная отсечка',
+      ok: 'С теплового щита полностью открыть клапан 6, проверить арматуру линии АЗГ на КУО и систему управления клапаном',
+      bad: ['Отключить сирену и продолжить работу', 'Подать водород в печь, не дожидаясь восстановления расхода'], ref: 'ПИ п.4.8' },
+    { p: 'h', range: [6.1, 6.6], title: 'Водород в АЗГ выше 5,5 %',
+      ok: 'Сообщить мастеру (сменному) ТУОРО и сменному мастеру УПГ, выяснить причину изменения состава АЗГ; водород в АЗГ не должен превышать 7 %',
+      bad: ['Продолжать работу — до 9 % это норма', 'Проверить состав газа, поднеся огонь к свече'], ref: 'ИЭ п.2.4.8.1, Прил. Б' },
+    { p: 'hc', range: [9.2, 9.6], title: 'Водород в камере охлаждения выше 9 % — срабатывает аварийная отсечка',
+      ok: 'Убедиться в срабатывании ОК1АГ; проверить герметичность КРО и КУО, выходной затвор, степень открытия свечи и линию подачи азотного газа на КУО',
+      bad: ['Увеличить подачу водорода в камеру выдержки', 'Вскрыть нижние люки КУО под газом для осмотра'], ref: 'ПИ п.4.7' },
+    { p: 'o', range: [0.55, 0.75], title: 'Кислород выше уставки сигнализации 0,5 %',
+      ok: 'Проверить давление на поду и газоплотность затворов, узнать у сменного мастера УПГ о наличии кислорода в защитном газе',
+      bad: ['Уменьшить подачу АЗГ, чтобы снизить давление', 'Не реагировать — кислород не влияет на полосу'], ref: 'ИЭ п.2.3.4.4, ПИ табл. 1' },
+    { p: 'w', range: [2.5, 4.5], title: 'Влажность в КВ ниже 6 г/м³',
+      ok: 'Проверить температуру воды и работу насоса скруббера, расходы увлажнённого и сухого АЗГ на смешение; при неисправности насоса перейти на резервный',
+      bad: ['Отключить нагреватели скруббера', 'Прекратить подачу АЗГ в камеру выдержки'], ref: 'ИЭ п.2.3.4.4' },
+    { p: 'w', range: [27, 31], title: 'Влажность в КВ выше 25 г/м³',
+      ok: 'Проверить температуру воды в скруббере; при её повышении отключить нагреватели и насос скруббера до восстановления влажности, проверить уровень воды',
+      bad: ['Увеличить задание на подогрев воды', 'Включить резервный насос скруббера'], ref: 'ИЭ п.2.3.4.4' },
+    { p: 't', range: [59, 64], title: 'Температура воды в увлажнителе выше 55 °C',
+      ok: 'Отключить нагреватели, выяснить причину перегрева (как правило — падение уровня воды в скруббере), заполнить скруббер водой и отрегулировать её подачу',
+      bad: ['Увеличить подачу АЗГ на камеру выдержки', 'Продолжать работу — температура воды не влияет на газ'], ref: 'ИЭ п.2.3.4.4, Прил. Б' },
+    { p: 's', range: [0.82, 0.95], title: 'Водород в воздухе выше 0,8 % (20 % НКПР)',
+      ok: 'Сообщить мастеру (сменному), выявить место утечки обмыливанием и устранить; при развитии аварии действовать по ПМЛиЛПА',
+      bad: ['Найти утечку с помощью зажигалки', 'Отключить сигнализатор СВК как неисправный'], ref: 'ПИ п.1.7.1–1.7.2' }
+];
+const ROUNDS = 10, NORMAL_ROUNDS = 4, PASS = 8;
+let sim = null, jitter = null;
+
+function fmt(v, d) { return v.toFixed(d).replace('.', ','); }
+function startSim() {
+    const faults = shuffle(FAULTS).slice(0, ROUNDS - NORMAL_ROUNDS);
+    const plan = shuffle([...faults, ...Array(NORMAL_ROUNDS).fill(null)]);
+    sim = { plan, round: 0, results: [], phase: 'decide', hinted: false, values: {} };
+    renderCells();
+    newRound();
+    if (jitter) clearInterval(jitter);
+    jitter = setInterval(tick, 1200);
+}
+function bandFor(p) {
+    const f = sim.plan[sim.round];
+    return f && f.p === p.id ? f.range : p.norm;
+}
+function newRound() {
+    sim.phase = 'decide'; sim.hinted = false;
+    PARAMS.forEach(p => { const b = bandFor(p); sim.values[p.id] = rnd(b[0], b[1]); });
+    document.getElementById('cells').className = 'cells';
+    document.querySelectorAll('.cell').forEach(c => c.classList.remove('bad', 'good', 'wrongpick'));
+    document.getElementById('btn-norm').disabled = false;
+    document.getElementById('btn-alarm').disabled = false;
+    document.getElementById('hint-btn').disabled = false;
+    document.getElementById('sim-round').textContent = `Раунд ${sim.round + 1} из ${ROUNDS}`;
+    msg('info', 'Оцените показания и нажмите «Норма» или «Тревога».');
+    renderDots(); updateValues();
+}
+function renderCells() {
+    document.getElementById('cells').innerHTML = PARAMS.map(p => `
+        <button class="cell" id="cell-${p.id}" onclick="pickCell('${p.id}')">
+            <span class="c-name">${p.name}</span>
+            <span class="lcd" id="v-${p.id}">--</span>
+            <span class="c-unit">${p.unit}</span>
+            <span class="c-norm">норма: ${p.ref}</span>
+        </button>`).join('');
+}
+function updateValues() {
+    PARAMS.forEach(p => { const el = document.getElementById('v-' + p.id); if (el) el.textContent = fmt(sim.values[p.id], p.d); });
+}
+function tick() {
+    if (!sim || sim.round >= ROUNDS) return;
+    PARAMS.forEach(p => {
+        const b = bandFor(p), span = b[1] - b[0];
+        let v = sim.values[p.id] + (Math.random() - 0.5) * span * 0.15;
+        sim.values[p.id] = Math.min(b[1], Math.max(b[0], v));
+    });
+    updateValues();
+}
+function renderDots() {
+    document.getElementById('sim-dots').innerHTML = Array.from({ length: ROUNDS }, (_, i) => {
+        const r = sim.results[i];
+        return `<i class="${r === true ? 'ok' : r === false ? 'err' : i === sim.round ? 'cur' : ''}"></i>`;
+    }).join('');
+}
+function msg(type, html) {
+    const m = document.getElementById('sim-msg');
+    m.className = 'sim-msg ' + type;
+    m.innerHTML = html;
+}
+function lockButtons() {
+    document.getElementById('btn-norm').disabled = true;
+    document.getElementById('btn-alarm').disabled = true;
+    document.getElementById('hint-btn').disabled = true;
+}
+function showNorms() {
+    if (!sim || sim.phase === 'result') return;
+    sim.hinted = true;
+    document.getElementById('cells').classList.add('hinted');
+}
+function decide(alarm) {
+    if (sim.phase !== 'decide') return;
+    const f = sim.plan[sim.round];
+    lockButtons();
+    if (!alarm && !f) return finishRound(true, '✅ Верно: все параметры в допустимых пределах.');
+    if (!alarm && f) {
+        document.getElementById('cell-' + f.p).classList.add('bad');
+        return finishRound(false, `❌ Пропущено отклонение: <b>${f.title}</b>.<br>Правильное действие: ${f.ok} <i>(${f.ref})</i>`);
+    }
+    if (alarm && !f) {
+        document.getElementById('cells').classList.add('hinted');
+        return finishRound(false, '❌ Ложная тревога: все параметры находились в допустимых пределах. Сравните показания с нормами на табло.');
+    }
+    sim.phase = 'locate';
+    document.getElementById('cells').classList.add('locate');
+    msg('info', '⚠ Тревога принята. <b>Нажмите на прибор, показания которого вышли за допустимые пределы.</b>');
+}
+function pickCell(id) {
+    if (sim.phase !== 'locate') return;
+    const f = sim.plan[sim.round];
+    document.getElementById('cells').classList.remove('locate');
+    if (id !== f.p) {
+        document.getElementById('cell-' + id).classList.add('wrongpick');
+        document.getElementById('cell-' + f.p).classList.add('bad');
+        return finishRound(false, `❌ Отклонение было на другом приборе: <b>${f.title}</b>.<br>Правильное действие: ${f.ok} <i>(${f.ref})</i>`);
+    }
+    document.getElementById('cell-' + id).classList.add('bad');
+    sim.phase = 'action';
+    const opts = shuffle([{ t: f.ok, ok: true }, ...f.bad.map(t => ({ t, ok: false }))]);
+    sim.opts = opts;
+    msg('info', `Верно, отклонение: <b>${f.title}</b>.<br>Выберите правильное действие:
+        <div class="act-list">${opts.map((o, i) => `<button class="act-opt" id="act-${i}" onclick="pickAction(${i})">${o.t}</button>`).join('')}</div>`);
+}
+function pickAction(i) {
+    if (sim.phase !== 'action') return;
+    const f = sim.plan[sim.round];
+    const right = sim.opts.findIndex(o => o.ok);
+    document.getElementById('act-' + right).classList.add('right');
+    if (i !== right) document.getElementById('act-' + i).classList.add('wrong');
+    document.querySelectorAll('.act-opt').forEach(b => b.disabled = true);
+    const ok = i === right;
+    const box = document.getElementById('sim-msg');
+    sim.phase = 'result';
+    const res = ok && !sim.hinted;
+    sim.results[sim.round] = res;
+    box.className = 'sim-msg ' + (ok ? 'ok' : 'err');
+    box.insertAdjacentHTML('beforeend', `<p style="margin:12px 0 0">${ok ? '✅ Правильно' : '❌ Неверно'}${sim.hinted && ok ? ' — но раунд с подсказкой не засчитан' : ''}. <i>Основание: ${f.ref}</i></p>
+        <button class="next-btn" onclick="nextRound()">${sim.round + 1 < ROUNDS ? 'Следующий раунд ➔' : 'Показать результат'}</button>`);
+    renderDots();
+}
+function finishRound(ok, text) {
+    sim.phase = 'result';
+    const res = ok && !sim.hinted;
+    sim.results[sim.round] = res;
+    msg(ok ? 'ok' : 'err', `${text}${sim.hinted && ok ? '<br><i>Раунд с подсказкой не засчитан.</i>' : ''}
+        <br><button class="next-btn" onclick="nextRound()">${sim.round + 1 < ROUNDS ? 'Следующий раунд ➔' : 'Показать результат'}</button>`);
+    renderDots();
+}
+function nextRound() {
+    sim.round++;
+    if (sim.round < ROUNDS) { newRound(); return; }
+    clearInterval(jitter);
+    renderDots();
+    lockButtons();
+    const score = sim.results.filter(Boolean).length;
+    document.getElementById('sim-round').textContent = 'Тренажёр завершён';
+    if (score >= PASS) {
+        store.set('module3_sim_passed', 'true');
+        msg('ok', `🎉 Результат: <b>${score} из ${ROUNDS}</b>. Тренажёр пройден!`);
+    } else {
+        msg('err', `Результат: <b>${score} из ${ROUNDS}</b>. Нужно не менее ${PASS}. Повторите справочник и таблицу сигнализации и попробуйте снова.
+            <br><button class="next-btn" onclick="startSim()">Пройти заново</button>`);
+    }
+    checkCompletion();
+}
+
+/* ================== ТЕСТ ================== */
+const QUIZ = [
+    { q: 'Каким прибором контролируется содержание кислорода в камере нагрева и КУО?',
+      o: ['ГТВ-1101', 'ГТМ5501', 'Гамма 100', 'ДВ-2М'], a: 1,
+      e: 'ГТМ5501 — кислород; ГТВ-1101 — водород; Гамма 100 — окись углерода; ДВ-2М — влажность.' },
+    { q: 'При какой концентрации водорода в воздухе срабатывает сигнализатор СВК?',
+      o: ['4 %', '0,8 % (20 % от НКПР)', '9 %', '75 %'], a: 1,
+      e: 'Концентрация водорода в воздухе не должна превышать 0,8 % объёмных — это 20 % от нижнего предела взрываемости.' },
+    { q: 'При каком содержании водорода в камере охлаждения срабатывает аварийная отсечка с продувкой печи азотом?',
+      o: ['Более 5 %', 'Более 7 %', 'Более 9 %', 'Более 20 %'], a: 2,
+      e: 'При повышении содержания водорода в камере охлаждения более 9 % автоматически отсекаются водород и АЗГ, печь продувается азотом.' },
+    { q: 'Сработал предупредительный сигнал падения давления в КУО (3 мм вод. ст.). Ваше первое действие?',
+      o: ['Сразу закрыть задвижку 1А', 'С теплового щита увеличить подачу АЗГ в камеру ускоренного охлаждения', 'Полностью открыть технологическую свечу', 'Отключить сигнализацию'], a: 1,
+      e: 'Сначала увеличивают подачу АЗГ в КУО; если давление не восстанавливается до 3–6 мм вод. ст. — увеличивают подачу в КН, затем прикрывают свечу (не менее 10 %).' },
+    { q: 'Какой допустимый общий расход АЗГ на печь по Приложению Б ИЭ?',
+      o: ['500–850 м³/ч', '850–1200 м³/ч', '1200–1700 м³/ч', '2000–2500 м³/ч'], a: 2,
+      e: 'Общий расход АЗГ на печь — 1200–1700 м³/ч; на КУО — 1000–1200, на КВ — 200–400, на КН — 0–100 м³/ч.' }
+];
+function renderQuiz() {
+    document.getElementById('quiz').innerHTML = QUIZ.map((item, i) => `
+        <div class="q-card" id="q${i}">
+            <div class="q-title">${i + 1}. ${item.q}</div>
+            ${item.o.map((o, j) => `<label class="q-opt"><input type="radio" name="q${i}" value="${j}"><span>${o}</span></label>`).join('')}
+            <div class="q-exp">${item.e}</div>
+        </div>`).join('');
+}
+function checkQuiz() {
+    let ok = 0;
+    QUIZ.forEach((item, i) => {
+        const sel = document.querySelector(`input[name="q${i}"]:checked`);
+        const card = document.getElementById('q' + i);
+        card.classList.remove('ok', 'bad');
+        if (sel && +sel.value === item.a) { card.classList.add('ok'); ok++; } else card.classList.add('bad');
+    });
+    const res = document.getElementById('quiz-result');
+    if (ok === QUIZ.length) {
+        store.set('module3_quiz_passed', 'true');
+        res.style.color = '#059669';
+        res.textContent = `Все ответы верны (${ok} из ${QUIZ.length})!`;
+        document.querySelectorAll('#quiz input').forEach(inp => inp.disabled = true);
+        document.getElementById('quiz-check').style.display = 'none';
+    } else {
+        res.style.color = '#dc2626';
+        res.textContent = `Верно ${ok} из ${QUIZ.length}. Исправьте ошибки и проверьте ещё раз.`;
+    }
+    checkCompletion();
+}
+function restoreQuiz() {
+    if (store.get('module3_quiz_passed') !== 'true') return;
+    QUIZ.forEach((item, i) => {
+        const r = document.querySelector(`input[name="q${i}"][value="${item.a}"]`);
+        if (r) r.checked = true;
+        document.getElementById('q' + i).classList.add('ok');
+    });
+    document.querySelectorAll('#quiz input').forEach(inp => inp.disabled = true);
+    document.getElementById('quiz-check').style.display = 'none';
+    document.getElementById('quiz-result').textContent = 'Тест пройден ✓';
+    document.getElementById('quiz-result').style.color = '#059669';
+}
+
+/* ================== ЗАВЕРШЕНИЕ ================== */
+function checkCompletion() {
+    const done = store.get('module3_sim_passed') === 'true' && store.get('module3_quiz_passed') === 'true';
+    document.getElementById('disabled-msg').style.display = done ? 'none' : 'block';
+    document.getElementById('next-module-btn').style.display = done ? 'block' : 'none';
+    document.getElementById('reset-btn').style.display = done ? 'block' : 'none';
+}
+function goNext() {
+    if (window.parent && window.parent !== window) {
+        window.parent.postMessage({ action: 'completeModule', moduleId: 3, next: 'test.html' }, '*');
+    } else {
+        window.location.href = 'module4.html';
+    }
+}
+function resetModule() {
+    store.del('module3_sim_passed');
+    store.del('module3_quiz_passed');
+    renderQuiz();
+    document.getElementById('quiz-check').style.display = 'block';
+    document.getElementById('quiz-result').textContent = '';
+    startSim();
+    checkCompletion();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ================== ЗАПУСК ================== */
+window.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.fig-row[data-imgs]').forEach(row => {
+        row.innerHTML = row.dataset.imgs.split('|').map(figHTML).join('');
+    });
+    renderInstr();
+    renderAlarms();
+    renderAuto();
+    renderQuiz();
+    restoreQuiz();
+    startSim();
+    if (store.get('module3_sim_passed') === 'true') {
+        msg('ok', '✅ Тренажёр уже пройден. Можно потренироваться ещё раз — результат не сбросится.');
+    }
+    checkCompletion();
+});
+</script>
+</body>
+</html>

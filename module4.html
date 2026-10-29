@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Модуль 4: Безопасность и нештатные ситуации</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f4f7fb; padding: 20px; color: #1e293b; line-height: 1.6; }
+        .lesson-container { max-width: 1000px; margin: 0 auto; background: #ffffff; padding: 40px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+
+        h2 { color: #0f172a; font-size: 2rem; margin-bottom: 24px; border-bottom: 2px solid #e2e8f0; padding-bottom: 12px; }
+        h3 { color: #0f172a; margin: 48px 0 16px 0; font-size: 1.4rem; }
+        h4 { color: #334155; margin: 28px 0 12px 0; font-size: 1.2rem; }
+        p { margin-bottom: 16px; font-size: 1.05rem; color: #334155; text-align: justify; }
+        strong { font-weight: 600; color: #0f172a; }
+        ul, ol { margin-bottom: 16px; padding-left: 24px; }
+        li { margin-bottom: 8px; font-size: 1.05rem; color: #334155; }
+
+        .alert-dark { background: #1e293b; color: #f8fafc; position: relative; padding: 20px 24px 20px 48px; border-radius: 8px; margin: 32px 0 32px 24px; font-size: 1.05rem; line-height: 1.5; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .alert-dark .alert-icon { position: absolute; left: -20px; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; background: #ffffff; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #0f172a; font-weight: bold; font-size: 1.4rem; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .alert-dark strong { color: #94a3b8; display: block; margin-bottom: 8px; font-weight: normal; }
+        .alert-light { background: #f8fafc; border-left: 4px solid #3b82f6; padding: 16px 20px; margin: 24px 0; border-radius: 0 8px 8px 0; color: #1e293b; font-size: 1.05rem; }
+        .alert-danger { background: #fef2f2; border-left: 4px solid #ef4444; padding: 16px 20px; margin: 24px 0; border-radius: 0 8px 8px 0; color: #991b1b; font-size: 1.05rem; }
+        .alert-danger ul { margin: 8px 0 0 0; }
+        .alert-danger li { color: #991b1b; }
+        .alert-warn { background: #fffbeb; border-left: 4px solid #f59e0b; padding: 16px 20px; margin: 24px 0; border-radius: 0 8px 8px 0; color: #78350f; font-size: 1.05rem; }
+        .alert-warn li { color: #78350f; }
+
+        /* Фото */
+        .fig-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin: 20px 0; }
+        .fig { margin: 0; }
+        .fig img { width: 100%; aspect-ratio: 4/3; object-fit: cover; border-radius: 10px; cursor: zoom-in; border: 1px solid #e2e8f0; display: block; }
+        .fig figcaption { font-size: 0.85rem; color: #64748b; text-align: center; margin-top: 6px; }
+        .fig .ph { aspect-ratio: 4/3; border: 2px dashed #cbd5e1; border-radius: 10px; display: flex; align-items: center; justify-content: center; text-align: center; color: #94a3b8; font-size: 0.8rem; padding: 12px; word-break: break-word; }
+
+        /* Шаги */
+        .steps { list-style: none; padding: 0; counter-reset: st; margin: 20px 0; }
+        .steps li { position: relative; padding: 12px 16px 12px 56px; margin-bottom: 10px; background: #f8fafc; border-radius: 10px; border: 1px solid #e2e8f0; counter-increment: st; }
+        .steps li::before { content: counter(st); position: absolute; left: 14px; top: 12px; width: 28px; height: 28px; border-radius: 50%; background: #0056b3; color: #fff; font-weight: 700; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; }
+
+        /* График разогрева */
+        .chart-box { border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin: 20px 0; background: #fff; }
+        .chart-box svg { width: 100%; height: auto; display: block; }
+
+        /* Таблица */
+        .table-wrap { overflow-x: auto; margin: 20px 0; border-radius: 12px; border: 1px solid #e2e8f0; }
+        table.t { width: 100%; border-collapse: collapse; font-size: 0.95rem; min-width: 620px; }
+        table.t th { background: #0f172a; color: #fff; text-align: left; padding: 12px; font-weight: 600; }
+        table.t td { padding: 10px 12px; border-top: 1px solid #e2e8f0; vertical-align: top; }
+        table.t tr:nth-child(even) td { background: #f8fafc; }
+
+        /* Аккордеон */
+        .acc { display: flex; flex-direction: column; gap: 10px; margin: 20px 0; }
+        .acc details { border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; }
+        .acc summary { cursor: pointer; padding: 14px 18px; font-weight: 600; list-style: none; display: flex; align-items: center; }
+        .acc summary::-webkit-details-marker { display: none; }
+        .acc summary::after { content: "+"; margin-left: auto; color: #3b82f6; font-size: 1.3rem; font-weight: 700; }
+        .acc details[open] summary::after { content: "–"; }
+        .acc details[open] summary { background: #f8fafc; border-bottom: 1px solid #e2e8f0; }
+        .acc .acc-body { padding: 14px 18px; }
+        .acc .acc-body ol { margin: 0; }
+
+        /* Телефоны */
+        .phones { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin: 20px 0; }
+        .phone { background: #7f1d1d; color: #fff; border-radius: 12px; padding: 16px; text-align: center; }
+        .phone b { display: block; font-size: 1.8rem; font-family: 'Consolas', monospace; letter-spacing: 1px; }
+        .phone span { font-size: 0.9rem; color: #fecaca; }
+
+        /* СИЗ и 5 шагов */
+        .ppe { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 20px 0; }
+        .ppe div { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px; text-align: center; font-size: 0.92rem; }
+        .ppe i { font-style: normal; font-size: 1.8rem; display: block; margin-bottom: 4px; }
+        .five { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin: 20px 0; }
+        .five div { border-radius: 12px; padding: 14px; color: #fff; font-size: 0.9rem; }
+        .five b { display: block; font-size: 1rem; margin-bottom: 6px; }
+
+        /* Сценарии */
+        .scen-tools { display: flex; align-items: center; gap: 10px; margin: 12px 0 16px; font-size: 0.95rem; color: #475569; }
+        .scen-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
+        .scen-card { border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; background: #fff; border-left: 5px solid #ef4444; display: flex; flex-direction: column; gap: 10px; }
+        .scen-card.done { border-left-color: #10b981; background: #f0fdf4; }
+        .scen-card h5 { font-size: 1.05rem; color: #0f172a; }
+        .scen-meta { font-size: 0.85rem; color: #64748b; }
+        .scen-btn { background: #dc2626; color: #fff; border: none; padding: 12px; border-radius: 8px; font-weight: 700; cursor: pointer; margin-top: auto; }
+        .scen-card.done .scen-btn { background: #10b981; }
+
+        /* Оверлей тревоги */
+        .ov { position: fixed; inset: 0; z-index: 2000; display: none; overflow-y: auto; padding: 24px 16px; }
+        .ov.open { display: block; }
+        .ov.alarm { background: #7f1d1d; animation: alarmbg 1s infinite; }
+        .ov.fail { background: #1f2937; }
+        .ov.ok { background: #064e3b; }
+        @keyframes alarmbg { 0%,100% { background: #7f1d1d; } 50% { background: #b91c1c; } }
+        @media (prefers-reduced-motion: reduce) { .ov.alarm { animation: none; } }
+        .ov-inner { max-width: 840px; margin: 0 auto; color: #fff; }
+        .ov-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+        .ov-siren { font-weight: 800; letter-spacing: 1px; font-size: 1.1rem; }
+        .ov-timer { font-family: 'Consolas', monospace; font-size: 3rem; font-weight: 700; line-height: 1; }
+        .ov-bar { height: 8px; background: rgba(255,255,255,.2); border-radius: 4px; overflow: hidden; margin: 12px 0 20px; }
+        .ov-bar div { height: 100%; width: 100%; background: #fde047; transition: width .1s linear; }
+        .ov-title { font-size: 1.6rem; margin: 0 0 10px; color: #fff; }
+        .ov-text { color: #fee2e2; text-align: left; }
+        .ov-task { color: #fff; font-weight: 600; text-align: left; }
+        .ov-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+        .ov-opt { background: #fff; color: #1e293b; border: none; border-radius: 10px; padding: 14px 16px; font-size: 1rem; text-align: left; cursor: pointer; font-weight: 600; display: flex; gap: 10px; align-items: center; box-shadow: 0 4px 0 rgba(0,0,0,.25); }
+        .ov-opt:hover { background: #fef9c3; }
+        .ov-opt.done { background: #22c55e; color: #fff; cursor: default; }
+        .ov-opt.wrong { background: #ef4444; color: #fff; }
+        .ov-opt .num { background: #fff; color: #15803d; width: 26px; height: 26px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: 800; }
+        .ov-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+        .ov-btn { background: #fff; color: #0f172a; border: none; padding: 12px 20px; border-radius: 8px; font-weight: 700; cursor: pointer; }
+        .ov-btn.ghost { background: transparent; color: #fff; border: 1px solid rgba(255,255,255,.5); }
+        .review { background: rgba(255,255,255,.08); border-radius: 12px; padding: 16px 20px; margin-top: 16px; }
+        .review ol { padding-left: 20px; margin: 0; }
+        .review li { color: #fff; margin-bottom: 10px; }
+        .review li small { display: block; color: #cbd5e1; font-size: 0.88rem; }
+        .ov-reason { font-size: 1.15rem; background: rgba(239,68,68,.25); border-radius: 10px; padding: 14px 16px; margin: 12px 0; }
+        .ov.ok .ov-reason { background: rgba(255,255,255,.12); }
+
+        /* Кнопки завершения */
+        .btn-group { display: flex; flex-direction: column; gap: 12px; margin-top: 32px; }
+        .nav-btn { background: #10b981; color: white; border: none; padding: 18px 32px; font-size: 1.1rem; font-weight: bold; border-radius: 8px; cursor: pointer; width: 100%; text-transform: uppercase; display: none; }
+        .nav-btn:hover { background: #059669; }
+        .reset-btn { background: transparent; color: #64748b; border: 1px solid #cbd5e1; padding: 12px 24px; font-size: 1rem; border-radius: 8px; cursor: pointer; width: 100%; display: none; }
+        .disabled-text { text-align: center; color: #94a3b8; font-size: 1rem; margin-top: 24px; padding: 16px; background: #f1f5f9; border-radius: 8px; }
+
+        .lightbox { position: fixed; inset: 0; background: rgba(15,23,42,.9); display: none; align-items: center; justify-content: center; z-index: 3000; cursor: zoom-out; padding: 20px; }
+        .lightbox.open { display: flex; }
+        .lightbox img { max-width: 100%; max-height: 90vh; border-radius: 8px; }
+
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .lesson-container { padding: 20px; }
+            .alert-dark { margin-left: 16px; padding-left: 36px; }
+            .alert-dark .alert-icon { left: -16px; width: 32px; height: 32px; font-size: 1.2rem; }
+            .ov-opts { grid-template-columns: 1fr; }
+            .ov-title { font-size: 1.3rem; }
+            .ov-timer { font-size: 2.4rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="lesson-container">
+
+    <h2>Безопасность и нештатные ситуации</h2>
+    <p>Это главный модуль курса. Вы повторите порядок пуска, остановки и продувки печи, разберёте действия при авариях по ПМЛиЛПА и требования охраны труда при газоопасных работах, а затем отработаете на тренажёре скорость и правильность реакции в аварийной ситуации.</p>
+
+    <div class="alert-dark">
+        <div class="alert-icon">!</div>
+        <strong>Золотое правило:</strong>
+        в любой ситуации, которая не прописана в производственной инструкции и в плане мероприятий по локализации и ликвидации последствий аварий, самостоятельные действия предпринимать запрещается. Сообщите мастеру и выполняйте работу только по его указаниям.
+    </div>
+
+    <!-- 1. РЕЖИМЫ РАБОТЫ -->
+    <h3>1. Режимы работы печи</h3>
+
+    <h4>Пуск печи с защитными атмосферами</h4>
+    <p>Все операции по пуску и остановке печи выполняют по распоряжению начальника или мастера участка ТУОРО ЦХП в присутствии мастера (сменного). Пуск защитных атмосфер в печь возможен только при <strong>отсутствии горючих газов у конструкции печи</strong>.</p>
+    <ol class="steps">
+        <li>Мастер (сменный) предупреждает работников о рисках, термист проверяет отсутствие людей вблизи газоопасных мест.</li>
+        <li>Проверяют исправность всех узлов, подачу воды ЧОЦ к водоохлаждаемым узлам, затворы, системы автоматического регулирования, аварийной продувки и сигнализации.</li>
+        <li>Проводят испытание печи на газоплотность в холодном и горячем состоянии. Места утечек ищут <strong>только обмыливанием</strong>.</li>
+        <li>Снятие заглушек на газопроводах выполняет газовая служба УПГ по наряду-допуску на газоопасные работы.</li>
+        <li>При температуре в печи <strong>не менее 300 °C</strong> и полностью закрытых люках, ложных окнах и тамбурах принимают в печь АЗГ, заранее предупредив персонал УПГ.</li>
+        <li>Водород подают в печной газопровод по наряду-допуску — после продувки АЗГ, заправки полосы и разогрева печи <strong>не менее 700 °C</strong>. Продувку ведут до содержания кислорода в атмосфере печи не более 0,5 %.</li>
+    </ol>
+    <div class="fig-row" data-imgs="panel|azgFurn"></div>
+
+    <h4>Разогрев печи после длительной остановки</h4>
+    <p>Скорость нагрева — 50 °C/час с выдержками при 300, 500 и 700 °C. Наведите взгляд на отметки графика: на каждой ступени выполняются свои операции.</p>
+    <div class="chart-box" id="heat-chart"></div>
+
+    <h4>Остановка печи</h4>
+    <ol class="steps">
+        <li>Отключить нагреватели печи и скруббера, задать в печь заправочный металл, остановить транспорт полосы, снять натяжение.</li>
+        <li>Прокручивать печные ролики при остывании печи до 500 °C.</li>
+        <li>Сообщить мастеру (сменному) УПГ, прекратить подачу водорода и продуть печь АЗГ до содержания водорода не более 5 %.</li>
+        <li>Снижать расход АЗГ постепенно — по 300 м³/ч с интервалом 10 минут — и закрыть арматуру, начиная с задвижки 1А, при температуре в печи ниже 500 °C.</li>
+        <li>Слесари УПГ по наряду-допуску устанавливают заглушки после задвижек 2В, 1А, 1АГ. Только после этого открывают люки, ложные окна и тамбуры.</li>
+        <li>Допуск термистов в камеры печи разрешается после охлаждения до температуры окружающей среды и восстановления содержания кислорода до 20 %.</li>
+    </ol>
+
+    <h4>Режимы при простоях агрегата</h4>
+    <div class="table-wrap">
+        <table class="t">
+            <thead><tr><th>Простой</th><th>Задание температуры по зонам</th><th>Что отключают</th></tr></thead>
+            <tbody>
+                <tr><td><b>до 2 часов</b></td><td>без изменений</td><td>вентилятор сушки полосы, щётки ЩММ</td></tr>
+                <tr><td><b>2–12 часов</b></td><td>1 зона — 650 ± 20 °C; 2–15 зоны — 750 ± 20 °C</td><td>насосы химподвала, вентилятор сушки, щётки ЩММ</td></tr>
+                <tr><td><b>12–24 часа</b></td><td>1 зона — 600 °C; 2–6 — 650 °C; 7–15 — 700 °C (± 20 °C)</td><td>насосы химподвала, вентилятор сушки, щётки ЩММ</td></tr>
+                <tr><td><b>более 24 часов</b></td><td>полная разборка электросхем, кроме привода печных роликов</td><td>при охлаждении до 500 °C перекрывают защитный газ с установкой заглушек на газопроводах АЗГ и продувочного азота, затем разбирают схему привода роликов</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h4>Аварийная остановка агрегата</h4>
+    <p>Технологический персонал останавливает агрегат <strong>без разрешения руководства цеха</strong> при несчастном случае, угрозе жизни или здоровью людей, разрушении или неисправности оборудования, его возгорании, а также при образовании дефектов на полосе. Кнопки аварийной остановки установлены на всех постах управления.</p>
+    <div class="fig-row" data-imgs="transport"></div>
+    <p>После аварийной остановки термист 7 разряда обязан: прекратить транспортировку полосы, отключить нагреватели зон, <strong>снизить расход АЗГ до 1300 м³/ч</strong>, отключить нагреватели и насос скруббера, отключить щётки ЩММ, выяснить у ЦРО ожидаемое время остановки, доложить мастеру (сменному) и диспетчеру ЦХП и получить задание.</p>
+
+    <h4>Правила безопасной продувки</h4>
+    <ul>
+        <li>Подачу АЗГ не прекращают до полного вытеснения водорода из печных газопроводов, увлажнителя и рабочего пространства печи — окончание продувки определяют по газоанализаторам (водорода не более 5 %).</li>
+        <li>Для ускорения вытеснения водорода увеличивают расход АЗГ на камеру выдержки и камеру ускоренного охлаждения.</li>
+        <li>При длительных остановках внешний газопровод водорода продувают продувочным азотом через свечу C₁ и заглушают после задвижки 2В.</li>
+        <li>Во время продувки следят за давлением в печи: при падении ниже 2 мм вод. ст. включают аварийную продувку продувочным азотом кнопкой «КПП».</li>
+    </ul>
+    <div class="alert-danger">
+        <strong>Запрещается:</strong>
+        <ul>
+            <li>проверять утечки открытым огнём и пользоваться факелом для обнаружения утечек;</li>
+            <li>тушить водой газовый факел при воспламенении водорода на газопроводе;</li>
+            <li>вести регулировку полосы и устранять дефекты во входном и выходном затворах под газом;</li>
+            <li>курить на ярусах печи, в районе узла регулирования газа и увлажнителя;</li>
+            <li>оставлять без присмотра работающую печь и рабочее место без разрешения мастера (сменного).</li>
+        </ul>
+    </div>
+
+    <!-- 2. ПМЛиЛПА -->
+    <h3>2. Действия при авариях (ПМЛиЛПА)</h3>
+    <p>При возгораниях, пожарах, инцидентах и авариях персонал ТУОРО действует в соответствии с Планом мероприятий по локализации и ликвидации последствий аварий на опасном производственном объекте II класса опасности.</p>
+
+    <div class="phones">
+        <div class="phone"><b>20-01</b><span>пожарная команда, ПАСФ</span></div>
+        <div class="phone"><b>23-25</b><span>УПГ (газовая служба)</span></div>
+        <div class="phone"><b>21-20</b><span>скорая помощь</span></div>
+    </div>
+
+    <h4>Памятка «Действия персонала при утечке газа»</h4>
+    <div class="acc">
+        <details open>
+            <summary>Первый обнаруживший аварию</summary>
+            <div class="acc-body"><ol>
+                <li>Окриком сообщить об аварии окружающему дежурному персоналу участка.</li>
+                <li>Сообщить о разрыве газопровода начальнику (сменному мастеру) участка, вызвать ПАСФ и УПГ по телефону (20-01, 23-25).</li>
+            </ol></div>
+        </details>
+        <details>
+            <summary>Производственный персонал участка (старший термист, термисты)</summary>
+            <div class="acc-body"><ol>
+                <li>Сообщить об аварии начальнику (сменному мастеру) участка.</li>
+                <li>По команде начальника (сменного мастера) прекратить все работы, не связанные с ликвидацией аварии, вывести людей в безопасную зону.</li>
+                <li>Надеть СИЗ.</li>
+                <li>Остановить агрегат, отключить подачу газа в печь согласно инструкции по аварийному останову (закрыть задвижку 1А).</li>
+                <li>Организовать высокообменную приточную вентиляцию и проветривание помещения, контролировать содержание кислорода в воздухе. При опасной концентрации азота и низком содержании кислорода немедленно доложить мастеру и по его команде эвакуироваться.</li>
+                <li>Принять меры к спасению людей и оказанию доврачебной помощи пострадавшим.</li>
+                <li>Организовать ограждение опасной зоны и выставление постов.</li>
+                <li>По команде мастера выявить место повреждения трубопровода и приступить к локализации аварии.</li>
+                <li>Уточнить личный состав эвакуировавшегося персонала.</li>
+            </ol></div>
+        </details>
+        <details>
+            <summary>Разрыв газопровода или взрыв в печи, под крышей, в пролёте (ПИ п.4.13)</summary>
+            <div class="acc-body"><ol>
+                <li>Применяя СИЗ, локализовать источник аварии, отключив подачу газа с теплового щита или перекрытием задвижки.</li>
+                <li>Обесточить АРО.</li>
+                <li>Сообщить диспетчеру ЦХП, мастеру (сменному) ТУОРО, мастеру газовой службы УПГ.</li>
+                <li>Вызвать пожарную команду (20-01) при пожаре и скорую помощь (21-20) при необходимости.</li>
+                <li>Вывести людей из зоны взрыва, оказать первую помощь пострадавшим.</li>
+                <li>Оградить опасную зону, выставить посты.</li>
+                <li>Принять меры по ликвидации аварии силами ДПД, пожарной части и газовой службы УПГ.</li>
+            </ol></div>
+        </details>
+    </div>
+
+    <div class="alert-light">
+        Действия при срабатывании автоматики — падении давления в печи, превышении водорода в камере охлаждения, отключении электроэнергии, падении давления АЗГ и сжатого воздуха — подробно разобраны в модуле 3. В тренажёре ниже они тоже есть.
+    </div>
+
+    <!-- 3. ОХРАНА ТРУДА -->
+    <h3>3. Охрана труда</h3>
+
+    <h4>Допуск к работе</h4>
+    <p>К работе с защитными атмосферами допускаются лица не моложе 18 лет, прошедшие медицинский осмотр, вводный и первичный инструктаж на рабочем месте, обученные по специальной программе, сдавшие квалификационный экзамен и ежегодно проходящие переаттестацию по правилам безопасной эксплуатации газового хозяйства башенных печей.</p>
+
+    <h4>Газоопасные работы</h4>
+    <ul>
+        <li>Работы по ремонту оборудования, газопроводов, арматуры и внутри печи проводят <strong>бригадой не менее 2 человек и одного наблюдающего снаружи</strong>, с оформлением наряда-допуска на газоопасные работы.</li>
+        <li>Пуск водорода в печной газопровод и контроль водорода ведут по наряду-допуску на газоопасные работы.</li>
+        <li>Перед огневыми и ремонтными работами на работающей печи и на подкрановых путях вызывают специалиста УПГ для анализа воздуха на содержание водорода в районе работ.</li>
+        <li>Перед началом работ термист проводит динамическую оценку рисков.</li>
+    </ul>
+
+    <h4>Средства индивидуальной защиты</h4>
+    <p>Старший термист и термисты обязаны прибыть на рабочее место в спецодежде за 15–20 минут до начала работы и проверить переносные газоанализаторы.</p>
+    <div class="ppe">
+        <div><i>⛑️</i>Каска с подбородочным ремешком</div>
+        <div><i>🥽</i>Защитные очки</div>
+        <div><i>🦺</i>Защитный костюм</div>
+        <div><i>🧤</i>Кожаные рукавицы, краги или вачеги</div>
+        <div><i>🥾</i>Кожаные ботинки</div>
+        <div><i>💪</i>Защитные нарукавники</div>
+        <div><i>🎧</i>Беруши или антифоны (зона индуктора)</div>
+        <div><i>📟</i>Переносной газоанализатор</div>
+    </div>
+
+    <h4>«5 шагов к безопасности»</h4>
+    <p>Методика экспресс-оценки рисков перед началом и во время работ (ИЭ, Приложение Г):</p>
+    <div class="five">
+        <div style="background:#64748b"><b>1. Сделай паузу</b>Продумай все этапы работы, оборудование и кто будет рядом.</div>
+        <div style="background:#475569"><b>2. Определи опасности</b>Какие опасные события могут произойти и насколько тяжелы последствия?</div>
+        <div style="background:#334155"><b>3. Защити себя и других</b>Что требуют инструкции? Есть ли навыки, СИЗ и приспособления?</div>
+        <div style="background:#1e293b"><b>4. Реши, что делать в экстренном случае</b>Знаешь ли порядок действий и как вызвать помощь?</div>
+        <div style="background:#0f172a"><b>5. Прими решение</b>Все ли меры выполнены? Можно ли начинать или продолжать работу?</div>
+    </div>
+
+    <h4>Первая помощь при удушье</h4>
+    <div class="alert-warn">
+        <strong>Общие правила.</strong> Сверьте этот блок с инструкцией по оказанию первой помощи вашего подразделения.
+        <ul style="margin-top:8px">
+            <li>Азот и АЗГ не имеют цвета и запаха — человек теряет сознание без предупреждающих признаков.</li>
+            <li><strong>Не входите в загазованную зону или камеру печи без изолирующих СИЗ</strong> и без наблюдающего — иначе пострадавших станет двое.</li>
+            <li>Вызовите помощь (скорая — 21-20) и сообщите мастеру.</li>
+            <li>Вынесите пострадавшего на свежий воздух, расстегните стесняющую одежду, проверьте дыхание.</li>
+            <li>При отсутствии дыхания приступите к сердечно-лёгочной реанимации до прибытия медиков.</li>
+        </ul>
+    </div>
+
+    <!-- 4. ТРЕНАЖЁР -->
+    <h3>4. Тренажёр «Аварийная ситуация»</h3>
+    <p>Запустите сценарий: экран станет красным, начнётся обратный отсчёт. Прочитайте ситуацию и нажимайте действия <strong>в правильном порядке</strong>. Среди кнопок есть ложные действия. Ошибка или истёкшее время — сценарий не пройден, вы увидите разбор. Для завершения модуля нужно пройти все сценарии.</p>
+    <div class="scen-tools">
+        <input type="checkbox" id="no-timer"> <label for="no-timer">Тренировочный режим без таймера (результат не засчитывается)</label>
+    </div>
+    <div class="scen-grid" id="scen-grid"></div>
+
+    <div id="disabled-msg" class="disabled-text">🔒 Пройдите все аварийные сценарии на время, чтобы перейти к итоговому тесту</div>
+    <div class="btn-group">
+        <button id="next-module-btn" class="nav-btn" onclick="goNext()">Перейти к итоговому тесту ➔</button>
+        <button id="reset-btn" class="reset-btn" onclick="resetModule()">Сбросить результаты тренажёра</button>
+    </div>
+</div>
+
+<div class="ov" id="ov"></div>
+<div class="lightbox" id="lightbox" onclick="this.classList.remove('open')"><img id="lightbox-img" alt=""></div>
+
+<script>
+/* ================== КАРТИНКИ ================== */
+const IMG_DIR = 'image/';
+const IMG = {
+    panel:     'тепловой щит с приборами илюстрация',
+    azgFurn:   'задвижки подачи АЗГ в печь иллюстрация',
+    transport: 'пост управления транспортом печи илюстрация'
+};
+const CAPTIONS = {
+    panel: 'Тепловой щит с приборами',
+    azgFurn: 'Задвижки подачи АЗГ в печь',
+    transport: 'Пост управления транспортом печи (кнопки аварийной остановки)'
+};
+const IMG_EXT = ['.png', '.PNG', '.jpg'];
+function imgVariants(name) {
+    const base = new Set();
+    [name, name.replace(/ил+юстрац/g, 'иллюстрац'), name.replace(/ил+юстрац/g, 'илюстрац')].forEach(v => {
+        base.add(v); base.add(v.replace(/\s{2,}/g, ' '));
+    });
+    const out = [];
+    base.forEach(v => [v.normalize('NFC'), v.normalize('NFD')].forEach(n => IMG_EXT.forEach(ext => {
+        const src = IMG_DIR + encodeURIComponent(n) + ext;
+        if (!out.includes(src)) out.push(src);
+    })));
+    return out;
+}
+function figHTML(key) {
+    if (!IMG[key]) return '';
+    return `<figure class="fig" data-key="${key}"><img src="${imgVariants(IMG[key])[0]}" data-try="0" alt="${CAPTIONS[key]}" loading="lazy" onerror="imgFail(this)" onclick="openLightbox(this)"><figcaption>${CAPTIONS[key]}</figcaption></figure>`;
+}
+function imgFail(el) {
+    const f = el.closest('figure');
+    const list = imgVariants(IMG[f.dataset.key]);
+    const next = (+el.dataset.try || 0) + 1;
+    if (next < list.length) { el.dataset.try = next; el.src = list[next]; return; }
+    el.remove();
+    f.insertAdjacentHTML('afterbegin', `<div class="ph">🖼 Нет файла:<br>${IMG_DIR}${IMG[f.dataset.key]}.png</div>`);
+}
+function openLightbox(el) {
+    document.getElementById('lightbox-img').src = el.src;
+    document.getElementById('lightbox').classList.add('open');
+}
+
+const store = {
+    get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+    set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} },
+    del(k) { try { localStorage.removeItem(k); } catch (e) {} }
+};
+const shuffle = a => { const r = [...a]; for (let i = r.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [r[i], r[j]] = [r[j], r[i]]; } return r; };
+const plural = (n, a, b, c) => { const m = n % 10, h = n % 100; return m === 1 && h !== 11 ? a : m >= 2 && m <= 4 && (h < 10 || h >= 20) ? b : c; };
+
+/* ================== ГРАФИК РАЗОГРЕВА (ИЭ п.2.2.2.8) ================== */
+function buildHeatChart() {
+    const pts = [[0, 20], [5.6, 300], [9.6, 300], [13.6, 500], [15.6, 500], [19.6, 700], [23.6, 700], [26.6, 850]];
+    const X = h => 60 + h * 26, Y = t => 270 - t * 0.27;
+    let s = `<svg viewBox="0 0 800 320" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, sans-serif">`;
+    [0, 300, 500, 700, 850].forEach(t => {
+        s += `<line x1="60" y1="${Y(t)}" x2="760" y2="${Y(t)}" stroke="#e2e8f0" stroke-dasharray="4 4"/>
+              <text x="52" y="${Y(t) + 4}" font-size="12" fill="#64748b" text-anchor="end">${t} °C</text>`;
+    });
+    [0, 5, 10, 15, 20, 25].forEach(h => s += `<text x="${X(h)}" y="292" font-size="12" fill="#64748b" text-anchor="middle">${h} ч</text>`);
+    s += `<polyline points="${pts.map(p => X(p[0]) + ',' + Y(p[1])).join(' ')}" fill="none" stroke="#ef4444" stroke-width="4" stroke-linejoin="round"/>`;
+    [[9.6, 300], [15.6, 500], [23.6, 700]].forEach(([h, t], i) => {
+        const hold = ['выдержка 4 ч', 'выдержка 2 ч', 'выдержка 4 ч'][i];
+        s += `<text x="${X(h) - 50}" y="${Y(t) - 8}" font-size="11" fill="#991b1b" text-anchor="middle">${hold}</text>`;
+    });
+    const marks = [
+        [5.6, 300, '① 300 °C: приём АЗГ, включение скруббера и газоподогревателя', 140],
+        [13.6, 500, '② 500 °C: ролики ½ оборота вперёд каждые 30 мин', 95],
+        [19.6, 700, '③ 650–700 °C: замена заправочной полосы; ≥700 °C — можно подавать водород', 50]
+    ];
+    marks.forEach(([h, t, txt, ty]) => {
+        s += `<circle cx="${X(h)}" cy="${Y(t)}" r="7" fill="#0056b3" stroke="#fff" stroke-width="2"/>
+              <line x1="${X(h)}" y1="${Y(t) - 8}" x2="${X(h)}" y2="${ty + 6}" stroke="#0056b3" stroke-dasharray="3 3"/>
+              <text x="${Math.min(X(h), 430)}" y="${ty}" font-size="12.5" font-weight="600" fill="#0056b3">${txt}</text>`;
+    });
+    s += `<text x="770" y="${Y(850) - 10}" font-size="11" fill="#475569" text-anchor="end">рабочая температура по ТИ</text>`;
+    s += `<text x="400" y="314" font-size="11" fill="#94a3b8" text-anchor="middle">Нагрев 50 °C/ч. Влажный газ подают только после выхода всех зон на температуру, в 15 зоне — не ниже 650 °C.</text>`;
+    document.getElementById('heat-chart').innerHTML = s + `</svg>`;
+}
+
+/* ================== СЦЕНАРИИ ТРЕНАЖЁРА ================== */
+const SCEN = [
+    { id: 'svk', title: 'Сработал сигнализатор СВК', time: 20,
+      alarm: 'Сработал СВК: концентрация водорода в воздухе пролёта превысила 0,8 %!',
+      text: 'Звучит сирена, на тепловом щите горит сигнальная лампа СВК. Вы находитесь у теплового щита АРО, рядом работают люди.',
+      steps: [
+        { t: 'Предупредить окружающий персонал об опасности', why: 'Первый обнаруживший аварию окриком сообщает о ней окружающему персоналу (памятка «Действия персонала при утечке газа»).' },
+        { t: 'Сообщить мастеру (сменному) ТУОРО', why: 'О превышении докладывают непосредственному руководителю; дальнейшие действия — по его команде.' },
+        { t: 'Надеть СИЗ', why: 'В зоне возможной загазованности работы ведутся только с применением СИЗ.' },
+        { t: 'Найти место утечки обмыливанием и принять меры к устранению', why: 'При сигнале о превышении водорода в воздухе необходимо выявить места утечек и устранить их (ПИ п.1.7.1). Проверка — только мыльным раствором (ПИ п.1.7.2).' }
+      ],
+      extra: [
+        { t: 'Найти утечку, поднеся зажигалку к фланцам', why: 'Проверка утечек открытым огнём и факелом запрещена (ПИ п.2.1.4.8, п.3.6). Водород взрывоопасен в диапазоне 4,1–75 %.' },
+        { t: 'Отключить сигнализатор СВК как ложный', why: 'Работа приборов сигнализации не должна прерываться (ИЭ п.2.4.1). Каждое срабатывание нужно отработать.' }
+      ],
+      ref: 'ПИ п.1.7.1–1.7.2, памятка «Действия персонала при утечке газа»' },
+    { id: 'rupture', title: 'Разрыв газопровода АЗГ', time: 25,
+      alarm: 'Разрыв газопровода АЗГ в пролёте печи!',
+      text: 'Слышен сильный шум выходящего газа, сработала сигнализация. Рядом с местом разрыва работают люди.',
+      steps: [
+        { t: 'Применяя СИЗ, отключить подачу газа с теплового щита или задвижкой', why: 'Источник аварии локализуют отключением подачи газа с теплового щита или перекрытием задвижки (ПИ п.4.13).' },
+        { t: 'Обесточить АРО', why: 'Исключает источники воспламенения и работу механизмов в аварийной зоне (ПИ п.4.13).' },
+        { t: 'Сообщить диспетчеру ЦХП, мастеру ТУОРО и мастеру газовой службы УПГ', why: 'ПИ п.4.13. При пожаре — вызвать пожарную команду 20-01, при необходимости скорую — 21-20.' },
+        { t: 'Вывести людей из опасной зоны', why: 'Затем — первая помощь пострадавшим, ограждение опасной зоны и выставление постов (ПИ п.4.13).' }
+      ],
+      extra: [
+        { t: 'Сходить в бытовку за личными вещами', why: 'Опасную зону покидают организованно, не отвлекаясь ни на что другое.' },
+        { t: 'Самостоятельно заварить место разрыва', why: 'Ликвидацию ведут силами ДПД, пожарной части и газовой службы УПГ; огневые работы — только по наряду-допуску после анализа воздуха.' }
+      ],
+      ref: 'ПИ п.4.13, ПМЛиЛПА' },
+    { id: 'pressure', title: 'Аварийное падение давления в печи', time: 20,
+      alarm: 'Давление в камерах печи упало ниже 2 мм вод. ст.!',
+      text: 'Звучит сирена, на тепловом щите горит сигнальная лампа. Автоматика отсекла водород и АЗГ и включила продувку печи продувочным азотом.',
+      steps: [
+        { t: 'Убедиться, что клапан ОК1АГ открылся (если нет — открыть байпас 5АГ)', why: 'Без продувочного азота печь останется без защитной атмосферы (ПИ п.4.6.1.1).' },
+        { t: 'Проверить давление АЗГ на подводе к печи и исправность арматуры', why: 'От этого зависит, можно ли прекратить аварийную продувку и вернуться к продувке АЗГ (ПИ п.4.6.1.1).' },
+        { t: 'Следить по газоанализаторам за продувкой до водорода не более 5 %', why: 'При недостаточном давлении АЗГ продувку азотом ведут до полного вытеснения водорода и прекращают кнопкой «КПП» (ПИ п.4.6.1.2).' },
+        { t: 'Устранить причину аварии и только после этого подать водород', why: 'Подача водорода — только после устранения причин аварии (ПИ п.4.6.1.3).' }
+      ],
+      extra: [
+        { t: 'Сразу прекратить продувку, не проверяя клапаны', why: 'Прекращать аварийную продувку можно, только убедившись в нормальном давлении АЗГ и исправности арматуры.' },
+        { t: 'Открыть люки печи для осмотра', why: 'Разгерметизация печи с водородом приводит к подсосу воздуха и образованию взрывоопасной смеси.' }
+      ],
+      ref: 'ПИ п.4.6' },
+    { id: 'power', title: 'Прекращение подачи электроэнергии', time: 15,
+      alarm: 'Прекращена подача электроэнергии!',
+      text: 'Погасли приборы на щитах. Сработала схема аварийной отсечки водорода и АЗГ и продувки печи продувочным азотом.',
+      steps: [
+        { t: 'Перекрыть газопровод водорода', why: 'Первое действие термиста при прекращении подачи электроэнергии (ПИ п.4.9.1.1).' },
+        { t: 'Продолжать аварийную продувку до полного вытеснения водорода', why: 'Если подача электроэнергии не возобновляется (ПИ п.4.9.1.1).' },
+        { t: 'После возобновления электроэнергии подать АЗГ, затем водород', why: 'С возобновлением подачи электроэнергии в печь подают АЗГ и водород (ПИ п.4.9.1.1).' }
+      ],
+      extra: [
+        { t: 'Подать водород сразу, не дожидаясь восстановления АЗГ', why: 'Водород подают только после восстановления защитной атмосферы АЗГ.' },
+        { t: 'Прекратить продувку, чтобы сэкономить азот', why: 'Продувка продолжается до полного вытеснения водорода из печи.' }
+      ],
+      ref: 'ПИ п.4.9' },
+    { id: 'break', title: 'Обрыв полосы в печи', time: 20,
+      alarm: 'Обрыв полосы в печи!',
+      text: 'Сработала сигнализация обрыва полосы, транспортировка полосы нарушена. Печь работает с водородом.',
+      steps: [
+        { t: 'Остановить движение полосы', why: 'ПИ п.4.12.2 — первое действие при обрыве полосы.' },
+        { t: 'Прекратить подачу водорода: ключ «УП» в положение «Д», закрыть 2В и 4В', why: 'ПИ п.4.12.2 и п.3.4.1–3.4.3.' },
+        { t: 'Продуть печь АЗГ до полного вытеснения водорода', why: 'Окончание продувки определяют по газоанализаторам — водорода не более 5 % (ПИ п.3.4.3).' },
+        { t: 'Разгерметизировать печь и заправить полосу', why: 'Разгерметизация и заправка возможны только после вытеснения водорода; после заправки печь уплотняют и подают водород (ПИ п.4.12.2).' }
+      ],
+      extra: [
+        { t: 'Сразу открыть нижние люки для заправки', why: 'Нельзя разгерметизировать печь, пока в ней есть водород.' },
+        { t: 'Увеличить подачу водорода в камеру выдержки', why: 'При обрыве полосы подачу водорода прекращают, а не увеличивают.' }
+      ],
+      ref: 'ПИ п.4.12.2' },
+    { id: 'estop', title: 'Аварийная остановка агрегата', time: 20,
+      alarm: 'Разрушение оборудования — требуется аварийная остановка АРО!',
+      text: 'На агрегате произошло разрушение узла оборудования. Вы — термист 7 разряда на посту управления.',
+      steps: [
+        { t: 'Прекратить транспортировку полосы кнопкой аварийной остановки', why: 'При разрушении или неисправности оборудования агрегат останавливают без разрешения руководства цеха; кнопки аварийной остановки есть на всех постах (ИЭ п.2.3.4.1–2.3.4.2).' },
+        { t: 'Отключить нагреватели зон печи', why: 'ИЭ п.2.3.4.3.' },
+        { t: 'Снизить расход АЗГ до 1300 м³/ч', why: 'Печь остаётся под защитной атмосферой при сниженном расходе (ИЭ п.2.3.4.3).' },
+        { t: 'Доложить мастеру (сменному) ТУОРО и диспетчеру ЦХП', why: 'ИЭ п.2.3.4.3; также выяснить у ЦРО ожидаемое время остановки и получить задание от мастера.' }
+      ],
+      extra: [
+        { t: 'Полностью перекрыть подачу АЗГ в печь', why: 'При аварийной остановке расход АЗГ снижают до 1300 м³/ч, а не перекрывают — без защитной атмосферы полоса окислится, а в печь подсосётся воздух.' },
+        { t: 'Запросить разрешение начальника цеха и ждать ответа', why: 'При разрушении или неисправности оборудования агрегат останавливают без разрешения руководства цеха.' }
+      ],
+      ref: 'ИЭ п.2.3.4.1–2.3.4.3' }
+];
+
+function renderScenCards() {
+    document.getElementById('scen-grid').innerHTML = SCEN.map((s, i) => {
+        const done = store.get('module4_drill_' + s.id) === 'true';
+        return `<div class="scen-card${done ? ' done' : ''}">
+            <h5>${done ? '✅ ' : '🚨 '}${s.title}</h5>
+            <div class="scen-meta">${s.steps.length} ${plural(s.steps.length, 'действие', 'действия', 'действий')} · ${s.time} секунд</div>
+            <button class="scen-btn" onclick="startDrill(${i})">${done ? 'Пройти ещё раз' : 'Запустить сценарий'}</button>
+        </div>`;
+    }).join('');
+}
+
+let drill = null;
+function startDrill(i) {
+    if (drill && drill.timer) clearInterval(drill.timer);
+    const s = SCEN[i];
+    const noTimer = document.getElementById('no-timer').checked;
+    const opts = shuffle([...s.steps.map((st, idx) => ({ t: st.t, idx })), ...s.extra.map(e => ({ t: e.t, idx: -1, why: e.why }))]);
+    drill = { i, s, k: 0, left: s.time, noTimer, opts, start: Date.now(), over: false, timer: null };
+    const ov = document.getElementById('ov');
+    ov.className = 'ov open alarm';
+    ov.innerHTML = `<div class="ov-inner">
+        <div class="ov-top"><span class="ov-siren">🚨 АВАРИЙНАЯ СИТУАЦИЯ</span><span class="ov-timer" id="ov-timer">${noTimer ? '∞' : s.time}</span></div>
+        <div class="ov-bar"><div id="ov-bar"></div></div>
+        <h3 class="ov-title">${s.alarm}</h3>
+        <p class="ov-text">${s.text}</p>
+        <p class="ov-task">Выполните ${s.steps.length} ${plural(s.steps.length, 'действие', 'действия', 'действий')} в правильном порядке:</p>
+        <div class="ov-opts">${opts.map((o, j) => `<button class="ov-opt" id="ov-o${j}" onclick="drillClick(${j})">${o.t}</button>`).join('')}</div>
+        <div class="ov-actions"><button class="ov-btn ghost" onclick="closeDrill()">Прервать</button></div>
+    </div>`;
+    ov.scrollTop = 0;
+    document.body.style.overflow = 'hidden';
+    if (!noTimer) {
+        drill.timer = setInterval(() => {
+            drill.left = Math.max(0, drill.left - 0.1);
+            updTimer();
+            if (drill.left <= 0) drillFail('timeout');
+        }, 100);
+    }
+}
+function updTimer() {
+    const t = document.getElementById('ov-timer'), b = document.getElementById('ov-bar');
+    if (t) t.textContent = Math.ceil(drill.left);
+    if (b) b.style.width = (drill.left / drill.s.time * 100) + '%';
+}
+function drillClick(j) {
+    if (!drill || drill.over) return;
+    const o = drill.opts[j];
+    const btn = document.getElementById('ov-o' + j);
+    if (o.idx === drill.k) {
+        btn.classList.add('done');
+        btn.disabled = true;
+        btn.insertAdjacentHTML('afterbegin', `<span class="num">${drill.k + 1}</span>`);
+        drill.k++;
+        if (drill.k === drill.s.steps.length) drillSuccess();
+    } else {
+        btn.classList.add('wrong');
+        drillFail('wrong', o);
+    }
+}
+function reviewHTML(s) {
+    return `<div class="review"><b>Правильный порядок действий:</b><ol style="margin-top:10px">
+        ${s.steps.map(st => `<li>${st.t}<small>${st.why}</small></li>`).join('')}
+    </ol><p style="color:#cbd5e1;margin:8px 0 0;font-size:0.9rem">Основание: ${s.ref}</p></div>`;
+}
+function drillFail(reason, o) {
+    drill.over = true;
+    clearInterval(drill.timer);
+    const s = drill.s;
+    let text;
+    if (reason === 'timeout') {
+        text = `⏱ <b>Время вышло.</b> Выполнено ${drill.k} из ${s.steps.length}. В аварийной ситуации промедление опасно — алгоритм нужно знать наизусть.`;
+    } else if (o.idx === -1) {
+        text = `❌ <b>Неверное действие:</b> «${o.t}».<br>${o.why}`;
+    } else {
+        text = `❌ <b>Нарушен порядок:</b> «${o.t}» — это шаг ${o.idx + 1}. Сначала нужно было: «${s.steps[drill.k].t}».`;
+    }
+    const ov = document.getElementById('ov');
+    ov.className = 'ov open fail';
+    ov.innerHTML = `<div class="ov-inner">
+        <div class="ov-top"><span class="ov-siren">РАЗБОР СИТУАЦИИ</span></div>
+        <h3 class="ov-title" style="margin-top:12px">${s.title}</h3>
+        <div class="ov-reason">${text}</div>
+        ${reviewHTML(s)}
+        <div class="ov-actions">
+            <button class="ov-btn" onclick="startDrill(${drill.i})">↺ Повторить сценарий</button>
+            <button class="ov-btn ghost" onclick="closeDrill()">Закрыть</button>
+        </div>
+    </div>`;
+    ov.scrollTop = 0;
+}
+function drillSuccess() {
+    drill.over = true;
+    clearInterval(drill.timer);
+    const s = drill.s;
+    const used = ((Date.now() - drill.start) / 1000).toFixed(1).replace('.', ',');
+    if (!drill.noTimer) store.set('module4_drill_' + s.id, 'true');
+    const nextIdx = SCEN.findIndex(x => store.get('module4_drill_' + x.id) !== 'true');
+    const ov = document.getElementById('ov');
+    ov.className = 'ov open ok';
+    ov.innerHTML = `<div class="ov-inner">
+        <div class="ov-top"><span class="ov-siren">✅ СИТУАЦИЯ ЛОКАЛИЗОВАНА</span></div>
+        <h3 class="ov-title" style="margin-top:12px">${s.title}</h3>
+        <div class="ov-reason">${drill.noTimer
+            ? 'Алгоритм выполнен верно. В тренировочном режиме результат не засчитывается — пройдите сценарий на время.'
+            : `Все действия выполнены в правильном порядке за <b>${used} с</b>.`}</div>
+        ${reviewHTML(s)}
+        <div class="ov-actions">
+            ${nextIdx >= 0 && nextIdx !== drill.i ? `<button class="ov-btn" onclick="startDrill(${nextIdx})">Следующий сценарий ➔</button>` : ''}
+            <button class="ov-btn ghost" onclick="closeDrill()">Закрыть</button>
+        </div>
+    </div>`;
+    ov.scrollTop = 0;
+}
+function closeDrill() {
+    if (drill && drill.timer) clearInterval(drill.timer);
+    drill = null;
+    document.getElementById('ov').className = 'ov';
+    document.body.style.overflow = '';
+    renderScenCards();
+    checkCompletion();
+}
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+        document.getElementById('lightbox').classList.remove('open');
+        if (drill && drill.over) closeDrill();
+    }
+});
+
+/* ================== ЗАВЕРШЕНИЕ ================== */
+function checkCompletion() {
+    const done = SCEN.every(s => store.get('module4_drill_' + s.id) === 'true');
+    document.getElementById('disabled-msg').style.display = done ? 'none' : 'block';
+    document.getElementById('next-module-btn').style.display = done ? 'block' : 'none';
+    document.getElementById('reset-btn').style.display = done ? 'block' : 'none';
+}
+function goNext() {
+    if (window.parent && window.parent !== window) {
+        window.parent.postMessage({ action: 'completeModule', moduleId: 4, next: 'test.html' }, '*');
+    } else {
+        window.location.href = 'test.html';
+    }
+}
+function resetModule() {
+    SCEN.forEach(s => store.del('module4_drill_' + s.id));
+    renderScenCards();
+    checkCompletion();
+}
+
+/* ================== ЗАПУСК ================== */
+window.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.fig-row[data-imgs]').forEach(row => {
+        row.innerHTML = row.dataset.imgs.split('|').map(figHTML).join('');
+    });
+    buildHeatChart();
+    renderScenCards();
+    checkCompletion();
+});
+</script>
+</body>
+</html>

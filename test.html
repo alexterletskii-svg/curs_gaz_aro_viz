@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Итоговый тест: Эксплуатация печей АРО</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f4f7fb; padding: 20px; color: #1e293b; line-height: 1.6; }
+        .lesson-container { max-width: 900px; margin: 0 auto; background: #ffffff; padding: 40px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        h2 { color: #0f172a; font-size: 2rem; margin-bottom: 16px; border-bottom: 2px solid #e2e8f0; padding-bottom: 12px; }
+        p { margin-bottom: 16px; font-size: 1.05rem; color: #334155; }
+        .info { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 24px; }
+        .info div { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px 16px; font-size: 0.95rem; }
+        .info b { color: #0056b3; }
+
+        fieldset.q { border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+        fieldset.q legend { font-weight: 600; color: #0f172a; padding: 0 8px; font-size: 1.02rem; }
+        .q-topic { font-size: 0.78rem; text-transform: uppercase; letter-spacing: .4px; color: #64748b; font-weight: 600; margin-bottom: 8px; }
+        .q-opt { display: flex; gap: 10px; align-items: flex-start; padding: 8px 12px; border-radius: 8px; cursor: pointer; }
+        .q-opt:hover { background: #f1f5f9; }
+        .q-opt input { margin-top: 6px; accent-color: #0056b3; }
+        fieldset.q.ok { border-color: #34d399; background: #f0fdf4; }
+        fieldset.q.bad { border-color: #f87171; background: #fef2f2; }
+        fieldset.q.missing { border-color: #f59e0b; background: #fffbeb; }
+        .q-opt.right { background: #dcfce7; font-weight: 600; }
+        .q-opt.chosen-wrong { background: #fee2e2; text-decoration: line-through; }
+        .q-exp { display: none; margin-top: 10px; font-size: 0.95rem; color: #334155; border-top: 1px dashed #cbd5e1; padding-top: 10px; }
+        fieldset.q.ok .q-exp, fieldset.q.bad .q-exp { display: block; }
+
+        .submit-btn { width: 100%; background: #0056b3; color: #fff; border: none; padding: 18px; font-size: 1.1rem; font-weight: 700; border-radius: 8px; cursor: pointer; margin-top: 8px; }
+        .submit-btn:hover { background: #004494; }
+        .warn-msg { display: none; color: #b45309; font-weight: 600; margin-top: 12px; text-align: center; }
+
+        .result { display: none; border-radius: 16px; padding: 28px; margin-bottom: 28px; color: #fff; }
+        .result.pass { background: linear-gradient(135deg, #059669, #10b981); }
+        .result.fail { background: linear-gradient(135deg, #b91c1c, #ef4444); }
+        .result h3 { font-size: 1.6rem; margin-bottom: 6px; }
+        .result .big { font-size: 3rem; font-weight: 800; line-height: 1.1; }
+        .result p { color: #fff; margin: 8px 0 0; }
+        .topics { background: #fff; color: #1e293b; border-radius: 12px; padding: 18px; margin-top: 18px; }
+        .topic-row { display: grid; grid-template-columns: 1fr 120px 60px; gap: 12px; align-items: center; padding: 8px 0; border-bottom: 1px dashed #e2e8f0; font-size: 0.95rem; }
+        .topic-row:last-child { border-bottom: none; }
+        .bar { height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
+        .bar div { height: 100%; background: #10b981; }
+        .bar.low div { background: #ef4444; }
+        .review-list { margin-top: 14px; padding-left: 20px; }
+        .review-list li { margin-bottom: 6px; }
+        .review-list a { color: #0056b3; font-weight: 600; }
+        .res-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+        .res-btn { background: #fff; color: #0f172a; border: none; padding: 12px 20px; border-radius: 8px; font-weight: 700; cursor: pointer; }
+        .res-btn.ghost { background: transparent; color: #fff; border: 1px solid rgba(255,255,255,.6); }
+
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .lesson-container { padding: 20px; }
+            .topic-row { grid-template-columns: 1fr 60px; }
+            .topic-row .bar { display: none; }
+        }
+    </style>
+</head>
+<body>
+<div class="lesson-container">
+    <h2>Итоговый тест</h2>
+    <p>Тест проверяет знания по всем модулям курса «Эксплуатация печей АРО и работа с защитными атмосферами». Ответьте на все вопросы и нажмите «Завершить тест».</p>
+    <div class="info">
+        <div>Вопросов: <b id="info-total"></b></div>
+        <div>Проходной балл: <b id="info-pass"></b></div>
+        <div>Лучший результат: <b id="info-best">—</b></div>
+    </div>
+
+    <div class="result" id="result"></div>
+
+    <form id="test-form" onsubmit="submitTest(event)">
+        <div id="questions"></div>
+        <button type="submit" class="submit-btn" id="submit-btn">Завершить тест</button>
+        <div class="warn-msg" id="warn-msg"></div>
+    </form>
+</div>
+
+<script>
+const TOPICS = {
+    1: { name: 'Модуль 1. Природа газов и защитные атмосферы', file: 'module1.html' },
+    2: { name: 'Модуль 2. Газовое оборудование и обход печи', file: 'module2.html' },
+    3: { name: 'Модуль 3. Контрольно-измерительные приборы', file: 'module3.html' },
+    4: { name: 'Модуль 4. Безопасность и нештатные ситуации', file: 'module4.html' }
+};
+const PASS_PERCENT = 80;
+const QUESTIONS = [
+    // Модуль 1
+    { m: 1, q: 'Каков состав азотного защитного газа (АЗГ)?',
+      o: ['95 % N₂ и 5 % H₂ (допуск по водороду ± 0,1 %)', '90 % N₂ и 10 % H₂', '80 % N₂ и 20 % H₂', '99 % N₂ и 1 % H₂'], a: 0,
+      e: 'АЗГ — гомогенная смесь 95 % азота и 5 % водорода с допуском по водороду ± 0,1 %.' },
+    { m: 1, q: 'В каком диапазоне концентраций смесь водорода с воздухом взрывоопасна?',
+      o: ['3,8–17,8 %', '4,1–75 %', '5–25 %', '0,5–15 %'], a: 1,
+      e: 'Водород взрывоопасен в смеси с воздухом от 4,1 до 75 % по объёму. 3,8–17,8 % — пределы для природного газа.' },
+    { m: 1, q: 'Какое утверждение об азоте верно?',
+      o: ['Азот горюч и взрывоопасен', 'Азот инертен, не горит, но вытесняет кислород и вызывает удушье', 'Азот имеет резкий запах', 'Азот токсичен в малых концентрациях'], a: 1,
+      e: 'Азот инертен — не горит и не взрывается, но, вытесняя кислород, вызывает удушье без предупреждающих признаков.' },
+    { m: 1, q: 'Чем обусловлена горючесть АЗГ?',
+      o: ['Содержанием азота', 'Только содержанием водорода', 'Примесью одоранта', 'Содержанием метана'], a: 1,
+      e: 'Фактическая горючесть АЗГ обусловлена только содержанием H₂.' },
+    // Модуль 2
+    { m: 2, q: 'Какой газ подают в камеру выдержки?',
+      o: ['Сухой АЗГ с точкой росы −40 °C', 'Увлажнённый АЗГ через увлажнитель УГ-1000', 'Природный газ', 'Сжатый воздух'], a: 1,
+      e: 'В КН, КРО и КУО подают сухой АЗГ, в камеру выдержки — увлажнённый АЗГ.' },
+    { m: 2, q: 'Какое давление поддерживают в печи, чтобы исключить подсос воздуха?',
+      o: ['0,1–0,5 мм вод. ст.', '1,5–10 мм вод. ст. на уровне нижних роликов', '50–100 мм вод. ст.', 'Разрежение 2 мм вод. ст.'], a: 1,
+      e: 'В печи поддерживают положительное давление 1,5–10 мм вод. ст. на уровне нижних роликов.' },
+    { m: 2, q: 'Что происходит с отсечными клапанами при аварийной продувке печи?',
+      o: ['ОК1АГ открывается, ОК1А и ОК1В закрываются', 'Все клапаны открываются', 'ОК1АГ закрывается, ОК1А открывается', 'Клапаны не меняют положения'], a: 0,
+      e: 'Открывается клапан продувочного азота ОК1АГ, закрываются ОК1А (АЗГ) и ОК1В (водород).' },
+    { m: 2, q: 'Какова степень открытия регулирующего органа технологической свечи при нормальной работе?',
+      o: ['100 %', '50 %', '20 %', '0 %'], a: 2,
+      e: 'При нормальной работе — 20 %, минимальная степень открытия — 10 %.' },
+    { m: 2, q: 'Как проверяют утечки газа на газопроводах и арматуре?',
+      o: ['Открытым пламенем', 'Только мыльным раствором', 'По запаху', 'На ощупь'], a: 1,
+      e: 'Утечки проверяют только мыльным раствором. Проверка огнём запрещена.' },
+    // Модуль 3
+    { m: 3, q: 'Каким прибором контролируют содержание кислорода в КН и КУО?',
+      o: ['ГТВ-1101', 'ГТМ5501', 'Гамма 100', 'Метран 150М'], a: 1,
+      e: 'ГТМ5501 — кислород; ГТВ-1101 — водород; Гамма 100 — CO; Метран 150М — давление и расход.' },
+    { m: 3, q: 'При какой концентрации водорода в воздухе срабатывает сигнализатор СВК?',
+      o: ['0,8 % (20 % от НКПР)', '4 %', '9 %', '75 %'], a: 0,
+      e: 'Концентрация водорода в воздухе не должна превышать 0,8 % — это 20 % нижнего предела взрываемости.' },
+    { m: 3, q: 'При каком содержании водорода в камере охлаждения срабатывает аварийная отсечка?',
+      o: ['Более 5 %', 'Более 7 %', 'Более 9 %', 'Более 20 %'], a: 2,
+      e: 'При содержании водорода более 9 % автоматически отсекаются водород и АЗГ, печь продувается азотом.' },
+    { m: 3, q: 'Каков допустимый общий расход АЗГ на печь АРО?',
+      o: ['500–850 м³/ч', '850–1200 м³/ч', '1200–1700 м³/ч', '2000–2500 м³/ч'], a: 2,
+      e: 'По Приложению Б ИЭ общий расход АЗГ — 1200–1700 м³/ч.' },
+    { m: 3, q: 'Сработал сигнал падения давления в КУО (3 мм вод. ст.). Что делают в первую очередь?',
+      o: ['Закрывают задвижку 1А', 'Увеличивают подачу АЗГ в КУО с теплового щита', 'Полностью открывают технологическую свечу', 'Отключают сигнализацию'], a: 1,
+      e: 'Сначала увеличивают подачу АЗГ в камеру ускоренного охлаждения, затем — в КН, затем прикрывают свечу.' },
+    // Модуль 4
+    { m: 4, q: 'При какой температуре в печи допускается приём АЗГ при разогреве?',
+      o: ['Не менее 100 °C', 'Не менее 300 °C', 'Не менее 700 °C', 'При любой температуре'], a: 1,
+      e: 'АЗГ подают при полностью закрытых люках, ложных окнах и тамбурах при температуре в печи не менее 300 °C.' },
+    { m: 4, q: 'Когда допускается подача водорода в печь?',
+      o: ['Сразу после включения нагрева', 'После продувки АЗГ, заправки полосы и разогрева не менее 700 °C', 'При температуре 300 °C', 'Без продувки, если печь герметична'], a: 1,
+      e: 'Подачу водорода осуществляют после полной продувки АЗГ, заправки полосы и разогрева печи не менее 700 °C.' },
+    { m: 4, q: 'Как поступить при воспламенении водорода на газопроводе печи?',
+      o: ['Потушить факел водой', 'Тушить водой запрещено — отключить подачу газа и действовать по ПМЛиЛПА', 'Сбить пламя ветошью', 'Ничего не делать'], a: 1,
+      e: 'Тушить водой газовый факел при воспламенении водорода запрещено (ПИ п.3.6).' },
+    { m: 4, q: 'Каким составом проводят работы по ремонту внутри печи?',
+      o: ['Один человек', 'Бригада не менее 2 человек и наблюдающий снаружи, по наряду-допуску', 'Два человека без наряда-допуска', 'Бригада любой численности без наблюдающего'], a: 1,
+      e: 'ПИ п.6.1: бригада не менее 2 человек и один наблюдающий снаружи, с оформлением наряда-допуска.' },
+    { m: 4, q: 'Что первым делает работник, обнаруживший утечку газа?',
+      o: ['Окриком сообщает окружающему персоналу', 'Идёт искать место утечки', 'Продолжает работу', 'Уходит домой'], a: 0,
+      e: 'По памятке первый обнаруживший окриком сообщает об аварии окружающим, затем — мастеру, вызывает ПАСФ и УПГ.' },
+    { m: 4, q: 'До какого значения снижают расход АЗГ при аварийной остановке агрегата?',
+      o: ['До нуля', 'До 600 м³/ч', 'До 1300 м³/ч', 'Расход не меняют'], a: 2,
+      e: 'ИЭ п.2.3.4.3: при аварийной остановке расход АЗГ снижают до 1300 м³/ч.' }
+];
+
+const store = {
+    get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+    set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} },
+    del(k) { try { localStorage.removeItem(k); } catch (e) {} }
+};
+
+function renderTest() {
+    document.getElementById('info-total').textContent = QUESTIONS.length;
+    document.getElementById('info-pass').textContent = `${PASS_PERCENT} % (${Math.ceil(QUESTIONS.length * PASS_PERCENT / 100)} из ${QUESTIONS.length})`;
+    const best = store.get('final_test_best');
+    if (best) document.getElementById('info-best').textContent = best + ' %';
+    document.getElementById('questions').innerHTML = QUESTIONS.map((item, i) => `
+        <fieldset class="q" id="q${i}">
+            <legend>${i + 1}. ${item.q}</legend>
+            <div class="q-topic">${TOPICS[item.m].name}</div>
+            ${item.o.map((o, j) => `<label class="q-opt" id="q${i}o${j}"><input type="radio" name="q${i}" value="${j}"><span>${o}</span></label>`).join('')}
+            <div class="q-exp">${item.e}</div>
+        </fieldset>`).join('');
+}
+
+function submitTest(e) {
+    e.preventDefault();
+    const missing = [];
+    QUESTIONS.forEach((_, i) => {
+        const fs = document.getElementById('q' + i);
+        fs.classList.remove('missing');
+        if (!document.querySelector(`input[name="q${i}"]:checked`)) { missing.push(i + 1); fs.classList.add('missing'); }
+    });
+    const warn = document.getElementById('warn-msg');
+    if (missing.length) {
+        warn.style.display = 'block';
+        warn.textContent = `Ответьте на все вопросы. Без ответа: ${missing.join(', ')}.`;
+        document.getElementById('q' + (missing[0] - 1)).scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+    }
+    warn.style.display = 'none';
+
+    let score = 0;
+    const byTopic = {};
+    Object.keys(TOPICS).forEach(k => byTopic[k] = { ok: 0, total: 0 });
+    QUESTIONS.forEach((item, i) => {
+        const sel = +document.querySelector(`input[name="q${i}"]:checked`).value;
+        const ok = sel === item.a;
+        const fs = document.getElementById('q' + i);
+        fs.classList.add(ok ? 'ok' : 'bad');
+        document.getElementById(`q${i}o${item.a}`).classList.add('right');
+        if (!ok) document.getElementById(`q${i}o${sel}`).classList.add('chosen-wrong');
+        fs.querySelectorAll('input').forEach(inp => inp.disabled = true);
+        byTopic[item.m].total++;
+        if (ok) { score++; byTopic[item.m].ok++; }
+    });
+
+    const percent = Math.round(score / QUESTIONS.length * 100);
+    const passed = percent >= PASS_PERCENT;
+    const best = Math.max(percent, +(store.get('final_test_best') || 0));
+    store.set('final_test_best', best);
+    document.getElementById('info-best').textContent = best + ' %';
+    if (passed) store.set('final_test_passed', 'true');
+
+    const weak = Object.keys(TOPICS).filter(k => byTopic[k].ok < byTopic[k].total);
+    const res = document.getElementById('result');
+    res.className = 'result ' + (passed ? 'pass' : 'fail');
+    res.style.display = 'block';
+    res.innerHTML = `
+        <h3>${passed ? '✅ Тест сдан' : '❌ Тест не сдан'}</h3>
+        <div class="big">${score} из ${QUESTIONS.length} · ${percent} %</div>
+        <p>${passed ? 'Поздравляем! Вы успешно освоили материал курса.' : `Для прохождения нужно не менее ${PASS_PERCENT} %. Повторите темы ниже и попробуйте снова.`}</p>
+        <div class="topics">
+            <b>Результат по модулям</b>
+            ${Object.keys(TOPICS).map(k => {
+                const t = byTopic[k], p = t.total ? Math.round(t.ok / t.total * 100) : 0;
+                return `<div class="topic-row"><span>${TOPICS[k].name}</span><div class="bar${p < PASS_PERCENT ? ' low' : ''}"><div style="width:${p}%"></div></div><b>${t.ok}/${t.total}</b></div>`;
+            }).join('')}
+            ${weak.length ? `<p style="color:#1e293b;margin-top:14px"><b>Рекомендуем повторить:</b></p>
+                <ul class="review-list">${weak.map(k => `<li><a href="${TOPICS[k].file}">${TOPICS[k].name}</a> — ошибок: ${byTopic[k].total - byTopic[k].ok}</li>`).join('')}</ul>`
+              : '<p style="color:#065f46;margin-top:14px"><b>Ошибок нет — отличный результат!</b></p>'}
+        </div>
+        <div class="res-actions">
+            ${passed ? '<button class="res-btn" onclick="finishCourse()">Завершить курс</button>' : ''}
+            <button class="res-btn ghost" onclick="retake()">↺ Пройти тест заново</button>
+        </div>`;
+    document.getElementById('submit-btn').style.display = 'none';
+    res.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function retake() {
+    document.getElementById('result').style.display = 'none';
+    document.getElementById('submit-btn').style.display = 'block';
+    renderTest();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function finishCourse() {
+    if (window.parent && window.parent !== window) {
+        window.parent.postMessage({ action: 'completeModule', moduleId: 5 }, '*');
+    } else {
+        window.location.href = 'index.html';
+    }
+}
+
+window.addEventListener('DOMContentLoaded', renderTest);
+</script>
+</body>
+</html>

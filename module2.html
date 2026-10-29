@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Модуль 2: Газовое оборудование и обход печи АРО</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f4f7fb; padding: 20px; color: #1e293b; line-height: 1.6; }
+        .lesson-container { max-width: 1000px; margin: 0 auto; background: #ffffff; padding: 40px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+
+        h2 { color: #0f172a; font-size: 2rem; margin-bottom: 24px; border-bottom: 2px solid #e2e8f0; padding-bottom: 12px; }
+        h3 { color: #0f172a; margin: 48px 0 16px 0; font-size: 1.4rem; }
+        h4 { color: #334155; margin: 0 0 12px 0; font-size: 1.2rem; }
+        p { margin-bottom: 16px; font-size: 1.05rem; color: #334155; text-align: justify; }
+        strong { font-weight: 600; color: #0f172a; }
+        ul { margin-bottom: 16px; padding-left: 24px; }
+        li { margin-bottom: 8px; font-size: 1.05rem; color: #334155; }
+
+        /* Плашки (как в модуле 1) */
+        .alert-dark { background: #1e293b; color: #f8fafc; position: relative; padding: 20px 24px 20px 48px; border-radius: 8px; margin: 32px 0 32px 24px; font-size: 1.05rem; line-height: 1.5; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .alert-dark .alert-icon { position: absolute; left: -20px; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; background: #ffffff; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #0f172a; font-weight: bold; font-size: 1.4rem; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .alert-dark strong { color: #94a3b8; display: block; margin-bottom: 8px; font-weight: normal; }
+        .alert-light { background: #f8fafc; border-left: 4px solid #3b82f6; padding: 16px 20px; margin: 24px 0; border-radius: 0 8px 8px 0; color: #1e293b; font-size: 1.05rem; }
+        .alert-danger { background: #fef2f2; border-left: 4px solid #ef4444; padding: 16px 20px; margin: 24px 0; border-radius: 0 8px 8px 0; color: #991b1b; font-size: 1.05rem; }
+        .alert-danger ul { margin: 8px 0 0 0; }
+        .alert-danger li { color: #991b1b; }
+
+        /* Цифры */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; margin: 24px 0 32px; }
+        .stat-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; text-align: center; }
+        .stat-box b { display: block; font-size: 1.6rem; color: #0056b3; line-height: 1.2; }
+        .stat-box span { font-size: 0.85rem; color: #64748b; }
+
+        /* Фото */
+        .fig-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin: 20px 0; }
+        .fig { margin: 0; }
+        .fig img { width: 100%; aspect-ratio: 4/3; object-fit: cover; border-radius: 10px; cursor: zoom-in; border: 1px solid #e2e8f0; display: block; transition: transform .2s; }
+        .fig img:hover { transform: scale(1.02); }
+        .fig figcaption { font-size: 0.85rem; color: #64748b; text-align: center; margin-top: 6px; }
+        .fig .ph { aspect-ratio: 4/3; border: 2px dashed #cbd5e1; border-radius: 10px; display: flex; align-items: center; justify-content: center; text-align: center; color: #94a3b8; font-size: 0.8rem; padding: 12px; word-break: break-word; }
+
+        /* Вкладки камер */
+        .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 24px 0 0; }
+        .tab-btn { background: #f1f5f9; border: 1px solid #e2e8f0; color: #334155; padding: 10px 16px; border-radius: 8px 8px 0 0; cursor: pointer; font-weight: 600; font-size: 0.95rem; transition: .2s; }
+        .tab-btn:hover { background: #e2e8f0; }
+        .tab-btn.active { background: #0056b3; color: #fff; border-color: #0056b3; }
+        .tab-panel { border: 1px solid #e2e8f0; border-radius: 0 12px 12px 12px; padding: 24px; background: #fff; }
+        .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin-bottom: 16px; }
+        .fact { background: #f8fafc; border-left: 3px solid #3b82f6; padding: 8px 12px; border-radius: 0 8px 8px 0; }
+        .fact span { display: block; font-size: 0.75rem; text-transform: uppercase; color: #64748b; font-weight: 600; letter-spacing: .3px; }
+        .fact strong { font-size: 1rem; }
+
+        /* Арматура */
+        .arm-list { display: flex; flex-direction: column; gap: 10px; margin: 20px 0; }
+        .arm-list details { border: 1px solid #e2e8f0; border-radius: 10px; background: #fff; overflow: hidden; }
+        .arm-list summary { cursor: pointer; padding: 14px 18px; font-weight: 600; color: #0f172a; list-style: none; display: flex; align-items: center; gap: 12px; }
+        .arm-list summary::-webkit-details-marker { display: none; }
+        .arm-list summary::after { content: "+"; margin-left: auto; color: #3b82f6; font-size: 1.3rem; font-weight: 700; }
+        .arm-list details[open] summary::after { content: "–"; }
+        .arm-list details[open] summary { background: #f8fafc; border-bottom: 1px solid #e2e8f0; }
+        .arm-tag { background: #0056b3; color: #fff; border-radius: 6px; padding: 2px 10px; font-size: 0.85rem; min-width: 64px; text-align: center; }
+        .arm-body { padding: 14px 18px; }
+        .arm-body p { margin-bottom: 8px; font-size: 1rem; }
+
+        /* Слайдер Было/Стало */
+        .sc-btns { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
+        .sc-btn { background: #fff; border: 1px solid #cbd5e1; padding: 8px 14px; border-radius: 20px; cursor: pointer; font-size: 0.95rem; color: #334155; transition: .2s; }
+        .sc-btn.active { background: #0f172a; color: #fff; border-color: #0f172a; }
+        .ba { position: relative; width: 100%; aspect-ratio: 900 / 360; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; background: #fff; user-select: none; }
+        .ba-layer { position: absolute; inset: 0; background: #fff; }
+        .ba-layer svg { width: 100%; height: 100%; display: block; }
+        .ba-top { clip-path: inset(0 0 0 50%); background: #fffbeb; }
+        .ba-handle { position: absolute; top: 0; bottom: 0; left: 50%; width: 3px; background: #0f172a; transform: translateX(-50%); pointer-events: none; }
+        .ba-handle span { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 38px; height: 38px; border-radius: 50%; background: #0f172a; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; box-shadow: 0 2px 8px rgba(0,0,0,.3); }
+        .ba-label { position: absolute; top: 10px; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; pointer-events: none; }
+        .ba-label.l { left: 10px; background: #dcfce7; color: #166534; }
+        .ba-label.r { right: 10px; background: #fee2e2; color: #991b1b; }
+        .ba input[type=range] { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: ew-resize; margin: 0; }
+        .ba-legend { display: flex; flex-wrap: wrap; gap: 16px; font-size: 0.85rem; color: #64748b; margin: 10px 0; }
+        .ba-legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -1px; margin-right: 6px; }
+        .diff-list { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px 18px; margin-top: 12px; }
+        .diff-list div { font-size: 0.95rem; padding: 4px 0; border-bottom: 1px dashed #e2e8f0; }
+        .diff-list div:last-child { border-bottom: none; }
+        .st-open { color: #16a34a; font-weight: 700; }
+        .st-closed { color: #dc2626; font-weight: 700; }
+        .flow { stroke-dasharray: 10 10; animation: flow 1s linear infinite; }
+        @keyframes flow { to { stroke-dashoffset: -20; } }
+
+        /* Маршрут обхода */
+        .route-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-top: 24px; }
+        .route-top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .route-task { font-size: 1.05rem; color: #0f172a; }
+        .route-task b { color: #0056b3; }
+        .route-meta { font-size: 0.9rem; color: #64748b; }
+        .route-progress { height: 6px; background: #e2e8f0; border-radius: 4px; overflow: hidden; margin-bottom: 16px; }
+        .route-progress div { height: 100%; width: 0; background: #10b981; transition: width .4s; }
+        .route-map { position: relative; width: 100%; aspect-ratio: 1000 / 560; background: #fff; border-radius: 10px; border: 1px solid #e2e8f0; overflow: hidden; }
+        .route-map svg { width: 100%; height: 100%; display: block; }
+        .hotspot { position: absolute; width: 34px; height: 34px; border-radius: 50%; transform: translate(-50%, -50%); border: 3px solid #fff; background: #3b82f6; color: #fff; font-weight: 700; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.3); font-size: 0.95rem; display: flex; align-items: center; justify-content: center; transition: background .2s, transform .2s; }
+        .hotspot:hover { transform: translate(-50%, -50%) scale(1.12); }
+        .hotspot.done { background: #10b981; }
+        .hotspot.hint { animation: pulse 0.8s ease-in-out 3; }
+        .hotspot.shake { animation: shake .4s; background: #ef4444; }
+        @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(59,130,246,.7); } 50% { box-shadow: 0 0 0 14px rgba(59,130,246,0); } }
+        @keyframes shake { 0%,100% { margin-left: 0; } 25% { margin-left: -6px; } 75% { margin-left: 6px; } }
+        .route-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+        .small-btn { background: #fff; border: 1px solid #cbd5e1; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 0.9rem; color: #334155; }
+        .small-btn:hover { background: #f1f5f9; }
+        .route-panel { display: none; background: #fff; border: 1px solid #e2e8f0; border-left: 4px solid #3b82f6; border-radius: 0 12px 12px 0; padding: 24px; margin-top: 20px; }
+        .rp-num { font-size: 0.8rem; text-transform: uppercase; font-weight: 700; color: #3b82f6; letter-spacing: .5px; }
+        .checks { display: flex; flex-direction: column; gap: 8px; margin: 16px 0; }
+        .check-item { display: flex; gap: 12px; align-items: flex-start; padding: 10px 14px; background: #f8fafc; border-radius: 8px; cursor: pointer; font-size: 1rem; }
+        .check-item input { margin-top: 5px; width: 18px; height: 18px; accent-color: #10b981; flex-shrink: 0; }
+        .confirm-btn { background: #0056b3; color: #fff; border: none; padding: 14px 24px; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; width: 100%; }
+        .confirm-btn:disabled { background: #cbd5e1; cursor: not-allowed; }
+        .done-note { color: #10b981; font-weight: 700; }
+        .route-success { background: #e6f4ea; border: 1px solid #34d399; color: #065f46; padding: 16px 20px; border-radius: 10px; margin-top: 16px; display: none; }
+
+        /* Тест */
+        .quiz { margin-top: 16px; display: flex; flex-direction: column; gap: 16px; }
+        .q-card { border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; }
+        .q-card.ok { border-color: #34d399; background: #f0fdf4; }
+        .q-card.bad { border-color: #f87171; background: #fef2f2; }
+        .q-title { font-weight: 600; margin-bottom: 12px; color: #0f172a; }
+        .q-opt { display: flex; gap: 10px; align-items: flex-start; padding: 8px 12px; border-radius: 8px; cursor: pointer; }
+        .q-opt:hover { background: #f1f5f9; }
+        .q-opt input { margin-top: 6px; accent-color: #0056b3; }
+        .q-exp { display: none; margin-top: 10px; font-size: 0.95rem; color: #334155; }
+        .q-card.ok .q-exp, .q-card.bad .q-exp { display: block; }
+        .quiz-result { font-weight: 600; margin-top: 8px; }
+
+        /* Кнопки (как в модуле 1) */
+        .btn-group { display: flex; flex-direction: column; gap: 12px; margin-top: 32px; }
+        .check-btn { background: #0056b3; color: #fff; border: none; padding: 14px 24px; font-size: 1rem; font-weight: 600; border-radius: 8px; cursor: pointer; }
+        .nav-btn { background: #10b981; color: white; border: none; padding: 18px 32px; font-size: 1.1rem; font-weight: bold; border-radius: 8px; cursor: pointer; width: 100%; text-transform: uppercase; display: none; }
+        .nav-btn:hover { background: #059669; }
+        .reset-btn { background: transparent; color: #64748b; border: 1px solid #cbd5e1; padding: 12px 24px; font-size: 1rem; border-radius: 8px; cursor: pointer; width: 100%; display: none; }
+        .reset-btn:hover { background: #f1f5f9; color: #1e293b; }
+        .disabled-text { text-align: center; color: #94a3b8; font-size: 1rem; margin-top: 24px; padding: 16px; background: #f1f5f9; border-radius: 8px; }
+
+        /* Лайтбокс и тост */
+        .lightbox { position: fixed; inset: 0; background: rgba(15,23,42,.9); display: none; align-items: center; justify-content: center; z-index: 1000; cursor: zoom-out; padding: 20px; }
+        .lightbox.open { display: flex; }
+        .lightbox img { max-width: 100%; max-height: 90vh; border-radius: 8px; }
+        .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(120px); background: #1e293b; color: #fff; padding: 14px 20px; border-radius: 10px; font-size: 0.95rem; max-width: 90%; z-index: 1001; transition: transform .3s; box-shadow: 0 8px 24px rgba(0,0,0,.25); }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .lesson-container { padding: 20px; }
+            .alert-dark { margin-left: 16px; padding-left: 36px; }
+            .alert-dark .alert-icon { left: -16px; width: 32px; height: 32px; font-size: 1.2rem; }
+            .hotspot { width: 26px; height: 26px; font-size: 0.75rem; border-width: 2px; }
+            .route-box { padding: 14px; }
+        }
+    </style>
+</head>
+<body>
+<div class="lesson-container">
+
+    <h2>Газовое оборудование и обход печи АРО</h2>
+    <p>В этом модуле вы разберётесь, как устроена башенная печь агрегата рекристаллизационного отжига, как подводится и распределяется азотный защитный газ, какую роль играет каждая задвижка и клапан, и пройдёте полный маршрут планового обхода печи.</p>
+
+    <div class="stats-grid">
+        <div class="stat-box"><b>44</b><span>вертикальных прохода полосы</span></div>
+        <div class="stat-box"><b>740 м</b><span>длина полосы в печи</span></div>
+        <div class="stat-box"><b>20 м</b><span>высота печи, 7 ярусов площадок</span></div>
+        <div class="stat-box"><b>800–860 °C</b><span>температура по зонам</span></div>
+        <div class="stat-box"><b>24–28</b><span>м/мин — технологическая скорость</span></div>
+    </div>
+
+    <!-- 1. УСТРОЙСТВО ПЕЧИ -->
+    <h3>1. Устройство башенной печи</h3>
+    <p>Башенная печь состоит из <strong>индукционной установки, камеры нагрева (КН), камеры выдержки (КВ), камеры регулируемого охлаждения (КРО) и камеры ускоренного охлаждения (КУО)</strong>. Все камеры соединены переходными тамбурами. Полоса транспортируется печными роликами, расположенными вверху и внизу каждого прохода; каждый ролик имеет индивидуальный привод, расстояние между осями верхних и нижних роликов — 14 м.</p>
+    <div class="fig-row" data-imgs="tower|rolls"></div>
+
+    <p>Выберите узел печи, чтобы посмотреть его характеристики:</p>
+    <div class="tabs" id="chamber-tabs"></div>
+    <div class="tab-panel" id="chamber-panel"></div>
+
+    <!-- 2. ТРУБОПРОВОДЫ -->
+    <h3>2. Подвод газов, трубопроводы и арматура</h3>
+    <p>В настоящее время печь снабжают <strong>азотным защитным газом (95 % N₂ + 5 % H₂)</strong>. Проектом также предусмотрена работа на водородном газе с содержанием водорода от 20 до 40 %. Схема подвода и разводки АЗГ приведена в приложении А инструкции по эксплуатации.</p>
+
+    <div class="fig-row" data-imgs="pipes|azgN2|azgValve"></div>
+
+    <h4>Куда и какой газ подаётся</h4>
+    <ul>
+        <li><strong>КН, КРО, КУО</strong> — сухой АЗГ, осушенный до точки росы −40 °C;</li>
+        <li><strong>КВ</strong> — увлажнённый АЗГ (точка росы около +60 °C, содержание влаги 17–25 г/м³), проходящий через увлажнитель газа УГ-1000;</li>
+        <li><strong>Давление в печи</strong> — положительное, 1,5–10 мм вод. ст. на уровне нижних роликов, чтобы исключить подсос воздуха.</li>
+    </ul>
+
+    <div class="alert-light">
+        <strong>Противоток.</strong> Прореагировавший с углеродом металла газ, насыщенный CO, удаляется через технологическую свечу в конце камеры нагрева. Поэтому газ в камере выдержки движется навстречу полосе: с полосой, где углерода уже меньше, контактирует более свежий газ — это ускоряет обезуглероживание.
+    </div>
+
+    <div class="alert-danger">
+        Переток влажного газа из камеры выдержки в камеры нагрева и охлаждения недопустим: он вызывает окисление полосы, а при работе с водородным газом создаёт опасность взрыва. Поэтому в КН и КУО постоянно подают сухой АЗГ в количестве, исключающем обратный переток.
+    </div>
+
+    <h4>Запорная, регулирующая и предохранительная арматура</h4>
+    <p>Нажмите на элемент, чтобы узнать его назначение.</p>
+    <div class="arm-list">
+        <details>
+            <summary><span class="arm-tag">1А</span> Задвижка на вводе АЗГ в печь</summary>
+            <div class="arm-body">
+                <p>Основная подающая задвижка газопровода защитного газа. При прекращении подачи АЗГ арматуру закрывают последовательно, начиная с задвижки 1А; при остановке на ремонт после неё слесари УПГ устанавливают заглушку по наряду-допуску.</p>
+            </div>
+        </details>
+        <details>
+            <summary><span class="arm-tag">2В</span> Задвижка на газопроводе водорода</summary>
+            <div class="arm-body">
+                <p>Отсекает подачу водорода. Перед приёмкой водорода с газопровода у задвижки 2В снимают заглушку под руководством мастера (сменного) ТУОРО; при длительной остановке внешний газопровод продувают азотом и заглушают после задвижки 2В.</p>
+            </div>
+        </details>
+        <details>
+            <summary><span class="arm-tag">ПКН</span> Предохранительный клапан низкого давления</summary>
+            <div class="arm-body">
+                <p>Установлен на газопроводе водорода. Автоматически отсекает водород от печи при падении давления водорода на узле редуцирования, а также при переводе ключа «УП» в положение «Д» (деблокировка). Открывается вручную подъёмом рычага, закрывается опусканием рычага.</p>
+            </div>
+        </details>
+        <details>
+            <summary><span class="arm-tag">ОК</span> Отсечные клапаны ОК1А, ОК1В, ОК1АГ и ЭПК</summary>
+            <div class="arm-body">
+                <p><strong>ОК1А</strong> — на линии АЗГ, <strong>ОК1В</strong> — на линии водорода, <strong>ОК1АГ</strong> — на линии продувочного (газгольдерного) азота. Управляются электропневматическим клапаном ЭПК.</p>
+                <p>При срабатывании аварийной продувки ОК1АГ открывается, а ОК1А и ОК1В закрываются. Если ОК1АГ не открылся — срочно открыть задвижку байпаса 5АГ.</p>
+            </div>
+        </details>
+        <details>
+            <summary><span class="arm-tag">РК</span> Регулирующие пневмоклапаны АЗГ</summary>
+            <div class="arm-body">
+                <p>Закрываются при увеличении давления сжатого командного азота. <strong>При отсутствии командного азота клапан полностью открыт</strong> — печь не остаётся без защитного газа. Управление — дистанционно с теплового щита в ручном или автоматическом режиме. Постоянное давление АЗГ перед печью поддерживает автоматический регулирующий клапан.</p>
+            </div>
+        </details>
+        <details>
+            <summary><span class="arm-tag">Свеча</span> Технологическая свеча и свечи безопасности</summary>
+            <div class="arm-body">
+                <p><strong>Технологическая свеча</strong> с дросселем в конце КН сбрасывает отработанный газ и служит для автоматического поддержания давления в печи. Степень открытия регулирующего органа при нормальной работе — <strong>20 %</strong>, минимальная — 10 %. В первом проходе КН есть отдельная свеча для сброса газа, загрязнённого возгонкой масла.</p>
+                <p><strong>Свечи безопасности:</strong> C₁ (вентиль 1В) — продувка внешнего газопровода водорода; C₂ (вентиль 3В) и C₃ (вентиль 5В) — продувка участков газопровода при приёмке и отключении водорода.</p>
+            </div>
+        </details>
+        <details>
+            <summary><span class="arm-tag">УГ</span> Увлажнитель газа УГ-1000 (скруббер)</summary>
+            <div class="arm-body">
+                <p>Рассчитан на увлажнение 1000 м³/ч газа до точки росы 70 °C. Состоит из колонки с насадкой из колец Рашига, корпуса с водными нагревателями (2 зоны по 135 кВт и 1 зона 45 кВт) и двух насосов — рабочего и резервного. Вода нагревается, насосом подаётся вверх колонки и стекает по насадке; газ входит снизу и, контактируя с водой, увлажняется. Используется холодная вода ХВ-1, 40 м³/ч.</p>
+            </div>
+        </details>
+    </div>
+    <div class="fig-row" data-imgs="azgFurn|scrubber"></div>
+
+    <h4>Узел регулирования газа (ГРУ) печи</h4>
+    <p>На узле регулирования поддерживаются давление и расход газов перед печью. При пуске водорода клапан 1 настраивают на давление <strong>500 мм вод. ст.</strong> и переводят регулятор давления водорода в автоматический режим; клапаном 2 по расходомеру устанавливают подачу водорода на увлажнитель <strong>150–300 м³/ч</strong>, затем регулятор расхода тоже переводят в автомат. Поступление газа в камеры нагрева и охлаждения обеспечивают регуляторы расхода на газопроводах АЗГ перед печью.</p>
+
+    <div class="alert-dark">
+        <div class="alert-icon">!</div>
+        <strong>Практическое правило:</strong>
+        утечки газа на газопроводах и арматуре проверяют <u>только мыльным раствором</u>. Проверка утечек открытым огнём запрещена.
+    </div>
+
+    <!-- СЛАЙДЕР -->
+    <h4>Сравните положение арматуры: «Было / Стало»</h4>
+    <p>Перетаскивайте разделитель по схеме влево-вправо. Зелёный клапан — открыт, красный — закрыт. Цветная анимированная линия — газ идёт, серая — газа нет.</p>
+    <div class="sc-btns" id="sc-btns"></div>
+    <div class="ba" id="ba">
+        <div class="ba-layer" id="ba-left"></div>
+        <div class="ba-layer ba-top" id="ba-right"></div>
+        <div class="ba-handle" id="ba-handle"><span>⇆</span></div>
+        <span class="ba-label l" id="ba-l"></span>
+        <span class="ba-label r" id="ba-r"></span>
+        <input type="range" min="0" max="100" value="50" id="ba-range" aria-label="Сравнение положений арматуры">
+    </div>
+    <div class="ba-legend">
+        <span><i style="background:#22c55e"></i>клапан открыт</span>
+        <span><i style="background:#ef4444"></i>клапан закрыт</span>
+        <span><i style="background:#111827"></i>заглушка</span>
+        <span>Линия водорода задействована только при работе печи с водородом</span>
+    </div>
+    <div class="alert-light" id="sc-note"></div>
+    <div class="diff-list" id="sc-diff"></div>
+    <p style="font-size:0.9rem;color:#64748b;margin-top:12px;">Схема упрощённая и служит только для понимания логики работы арматуры. Действительная обвязка газопроводов приведена в Приложении А ИЭ 48576703-ES-013-0001 и ПИ 48576703-ES-013-0005.</p>
+
+    <!-- 3. ГАЗОПЛОТНОСТЬ -->
+    <h3>3. Контроль газоплотности печи</h3>
+    <p>Перед приёмом защитных атмосфер печь испытывают на газоплотность. <strong>В холодном состоянии</strong> закрывают резиной затворы на входе и выходе полосы, заглушают свечу и держат давление около 7 мм вод. ст. (на уровне нижних роликов) при подаче 1300 м³/ч АЗГ. Потери защитного газа не должны превышать:</p>
+    <div class="stats-grid">
+        <div class="stat-box"><b>≤ 180</b><span>м³/ч — камера нагрева</span></div>
+        <div class="stat-box"><b>≤ 80</b><span>м³/ч — камера выдержки</span></div>
+        <div class="stat-box"><b>≤ 100</b><span>м³/ч — камера ускоренного охлаждения</span></div>
+        <div class="stat-box"><b>≤ 500</b><span>м³/ч на печь при горячем испытании</span></div>
+    </div>
+    <p><strong>В горячем состоянии</strong> останавливают транспортировку полосы, с теплового щита закрывают регулирующий орган технологической свечи и держат давление 7 мм вод. ст. Если расход превышает норму — места утечек находят обмыливанием, устраняют и повторяют испытание. Регулятор давления должен держать задание стабильно: колебания по вторичному прибору — не более 1 мм вод. ст.</p>
+
+    <!-- 4. ОБХОД -->
+    <h3>4. Практика: плановый обход печи</h3>
+    <p>Обход начинается с теплового щита — сначала оцените параметры по приборам, затем идите по газовой разводке и увлажнителю, далее по ходу полосы: индуктор, входной затвор, ролики и люки, технологические свечи на верхних ярусах, кессоны КУО и выходной затвор.</p>
+    <p><strong>Задание:</strong> найдите на схеме печи нужный узел и нажмите на него. Откроется чек-лист — отметьте каждый пункт проверки. Перейти к следующему узлу можно только после проверки текущего.</p>
+
+    <div class="route-box">
+        <div class="route-top">
+            <div class="route-task" id="route-task"></div>
+            <div class="route-meta" id="route-meta"></div>
+        </div>
+        <div class="route-progress"><div id="route-bar"></div></div>
+        <div class="route-map" id="route-map"></div>
+        <div class="route-actions">
+            <button class="small-btn" onclick="showHint()">💡 Подсказка</button>
+            <button class="small-btn" onclick="resetRoute()">↺ Начать обход заново</button>
+        </div>
+        <div class="route-panel" id="route-panel"></div>
+        <div class="route-success" id="route-success">✅ Обход печи завершён. Все узлы проверены — можно переходить к контрольным вопросам.</div>
+    </div>
+
+    <div class="alert-danger">
+        <strong>При работе с защитными атмосферами запрещается:</strong>
+        <ul>
+            <li>курить на ярусах печи, в районе узла регулирования газа и увлажнителя;</li>
+            <li>оставлять без присмотра работающую печь с газовым хозяйством и рабочее место без разрешения мастера (сменного);</li>
+            <li>тушить водой газовый факел при воспламенении водорода на газопроводе;</li>
+            <li>пользоваться факелом для обнаружения утечек газа;</li>
+            <li>регулировать полосу и устранять дефекты во входном и выходном затворах под газом.</li>
+        </ul>
+    </div>
+
+    <!-- 5. ТЕСТ -->
+    <h3>5. Контрольные вопросы</h3>
+    <p id="quiz-lock" class="disabled-text">🔒 Вопросы откроются после завершения обхода печи</p>
+    <div id="quiz-wrap" style="display:none">
+        <div class="quiz" id="quiz"></div>
+        <div class="btn-group" style="margin-top:16px">
+            <button class="check-btn" id="quiz-check" onclick="checkQuiz()">Проверить ответы</button>
+        </div>
+        <div class="quiz-result" id="quiz-result"></div>
+    </div>
+
+    <div id="disabled-msg" class="disabled-text">🔒 Пройдите обход и ответьте на все вопросы, чтобы перейти к модулю 3</div>
+    <div class="btn-group">
+        <button id="next-module-btn" class="nav-btn" onclick="goNext()">Перейти к модулю 3 ➔</button>
+        <button id="reset-btn" class="reset-btn" onclick="resetModule()">Пройти модуль ещё раз</button>
+    </div>
+</div>
+
+<div class="lightbox" id="lightbox" onclick="this.classList.remove('open')"><img id="lightbox-img" alt=""></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================== КАРТИНКИ ================== */
+/* Имена — точно по списку файлов в папке image (без расширения .png).
+   Если файл не найдётся, скрипт сам попробует варианты написания (см. imgVariants). */
+const IMG_DIR = 'image/';
+const IMG = {
+    screen:     '1774506747181 илюстрация',
+    tower:      'башенная печь АРО иллюстрация',
+    fanIn:      'вентилятор на входном затворе иллюстрация',
+    rollWater:  'водяное охлаждение печного ролика иллюстрация',
+    gateIn:     'входной затвор иллюстрация',
+    gateOut:    'выходной затвор иллюстрация',
+    azgInd:     'задвижка на подачу  АЗГ в индуктор иллюстрация',
+    azgN2:      'задвижки на подачу АЗГ и азотного газа иллюстрация',
+    azgFurn:    'задвижки подачи АЗГ в печь иллюстрация',
+    zones:      'зоны печи_илюстрация',
+    caissons:   'кессоны с роликовыми коробками илюстрация',
+    azgValve:   'клапан подачи АЗГ в печь илюстрация',
+    indMonitor: 'монитор параметрами работы индуктора илюстрации',
+    rolls:      'печные ролики илюстрации',
+    pyro:       'пирометр индуктора илюстрация',
+    azgScrub:   'подача АЗГ в скруббер илюстрация',
+    waterScrub: 'подача воды в скруббер илюстрация',
+    breakAlarm: 'подключение сигнализации на обыв полосы на нижних крышках кессонов илюстрация',
+    transport:  'пост управления транспортом печи илюстрация',
+    drivesCais: 'привода печных роликов илюстрация',
+    drives:     'приводы печных роликов илюстрация',
+    pipes:      'Разводка трубопроводов АЗГ илюстрация',
+    expTank:    'расширительный бак на подпитку кессонов илюстрация',
+    levelAlarm: 'сигнализация уровня воды в кессонах илюстрация',
+    scrubber:   'Скруббер с насосами илюстрация',
+    panel:      'тепловой щит с приборами илюстрация'
+};
+const CAPTIONS = {
+    screen:     'Экран параметров печи',
+    zones:      'Зоны печи на мониторе',
+    breakAlarm: 'Сигнализация на обрыв полосы на нижних крышках кессонов',
+    indMonitor: 'Монитор параметров работы индуктора',
+    azgInd:     'Задвижка на подачу АЗГ в индуктор',
+    drivesCais: 'Привода печных роликов в кессонах'
+};
+const IMG_EXT = ['.png', '.PNG', '.jpg'];
+
+/* Все варианты имени: «иллюстрация»/«илюстрация», одинарные/двойные пробелы,
+   разные кодировки буквы «й» (NFC/NFD) и расширения */
+function imgVariants(name) {
+    const base = new Set();
+    [name,
+     name.replace(/ил+юстрац/g, 'иллюстрац'),
+     name.replace(/ил+юстрац/g, 'илюстрац')
+    ].forEach(v => {
+        base.add(v);
+        base.add(v.replace(/\s{2,}/g, ' '));
+        base.add(v.replace('подачу АЗГ', 'подачу  АЗГ'));
+    });
+    const out = [];
+    base.forEach(v => {
+        [v.normalize('NFC'), v.normalize('NFD')].forEach(n => {
+            IMG_EXT.forEach(ext => {
+                const src = IMG_DIR + encodeURIComponent(n) + ext;
+                if (!out.includes(src)) out.push(src);
+            });
+        });
+    });
+    return out;
+}
+function cap(key) {
+    if (CAPTIONS[key]) return CAPTIONS[key];
+    const s = IMG[key].replace(/[_\s]*ил+юстрац[а-яё]*\s*$/i, '').replace(/\s{2,}/g, ' ').trim();
+    return s.charAt(0).toUpperCase() + s.slice(1);
+}
+function figHTML(key) {
+    const name = IMG[key];
+    if (!name) return '';
+    const first = imgVariants(name)[0];
+    return `<figure class="fig" data-key="${key}"><img src="${first}" data-try="0" alt="${cap(key)}" loading="lazy" onerror="imgFail(this)" onload="imgOk(this)" onclick="openLightbox(this)"><figcaption>${cap(key)}</figcaption></figure>`;
+}
+function imgFail(el) {
+    const f = el.closest('figure');
+    const list = imgVariants(IMG[f.dataset.key]);
+    const next = (+el.dataset.try || 0) + 1;
+    if (next < list.length) {
+        el.dataset.try = next;
+        el.src = list[next];
+        return;
+    }
+    el.remove();
+    f.insertAdjacentHTML('afterbegin', `<div class="ph">🖼 Нет файла:<br>${IMG_DIR}${IMG[f.dataset.key]}.png</div>`);
+    console.warn('Картинка не найдена:', IMG[f.dataset.key]);
+}
+function imgOk(el) {
+    if (+el.dataset.try > 0) console.info('Картинка найдена под другим именем:', decodeURIComponent(el.getAttribute('src')));
+}
+function openLightbox(el) {
+    document.getElementById('lightbox-img').src = el.src;
+    document.getElementById('lightbox').classList.add('open');
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') document.getElementById('lightbox').classList.remove('open'); });
+
+let toastTimer;
+function toast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 3500);
+}
+const store = {
+    get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+    set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} },
+    del(k) { try { localStorage.removeItem(k); } catch (e) {} }
+};
+
+/* ================== УЗЛЫ ПЕЧИ (вкладки) ================== */
+const CHAMBERS = [
+    { short: 'Индуктор', title: 'Индукционная установка',
+      facts: [['Нагрев', 'до 900 °C'], ['Принцип', 'вихревые токи'], ['Охлаждение', 'вода ЧОЦ']],
+      text: 'Служит для сверхбыстрого нагрева полосы перед обезуглероживающим отжигом. Оснащена входным герметизирующим устройством, уменьшающим утечки газовой смеси и потери тепла. Катушки, магнитные ярма и концентраторы охлаждаются водой. Индуктор — источник ультразвука: в зоне его работы обязательны беруши или антифоны, находиться на индукторе и под ним во время работы запрещено.',
+      imgs: ['pyro', 'indMonitor', 'azgInd'] },
+    { short: 'КН', title: 'Камера нагрева (КН)',
+      facts: [['Ходов полосы', '6 (3 вверх, 3 вниз)'], ['Полоса в камере', '96 м'], ['Зоны', '11 (№1–11)'], ['Мощность', '~6100 кВт']],
+      text: 'Электронагреватели из хромоникелевой проволоки Ø10 мм расположены в каждой шахте с обеих сторон полосы; расход электроэнергии плавно регулируется тиристорными преобразователями. Все выводы из печи (шейки роликов, выводы нагревателей, термопары) имеют уплотнения, камера заключена в герметичный каркас. В КН подаётся сухой АЗГ; в первом проходе есть свеча для сброса газа, загрязнённого возгонкой масла.',
+      imgs: ['zones', 'screen'] },
+    { short: 'КВ', title: 'Камера выдержки (КВ)',
+      facts: [['Ходов полосы', '9 (5 вверх, 4 вниз)'], ['Полоса в камере', '141 м'], ['Зоны', '3 (№12–14)'], ['Мощность', '1470 кВт']],
+      text: 'Здесь идёт обезуглероживание: в камеру подаётся увлажнённый АЗГ через увлажнитель УГ-1000. Кладка двухслойная толщиной 464 мм. Влажность регулируют температурой воды в скруббере и расходом АЗГ на камеру выдержки. Доступ — через верхние и нижние люки и боковые двери.',
+      imgs: ['azgScrub', 'scrubber'] },
+    { short: 'КРО', title: 'Камера регулируемого охлаждения (КРО)',
+      facts: [['Ходов полосы', '3 (2 вниз, 1 вверх)'], ['Полоса в камере', '47 м'], ['Зона', '1 (№15), 490 кВт']],
+      text: 'Футеровка аналогична камере выдержки, вверху и внизу по одному люку. Здесь установлен сигнализатор перетока водорода из камеры выдержки: при превышении содержания H₂ в КРО увеличивают подачу сухого АЗГ на камеру ускоренного охлаждения.',
+      imgs: ['rolls'] },
+    { short: 'КУО', title: 'Камера ускоренного охлаждения (КУО)',
+      facts: [['Ходов полосы', '22'], ['Полоса в камере', '334 м'], ['Ролики', '21 шт, Ø600 мм'], ['Полоса на выходе', 'до 150 °C']],
+      text: 'Полоса охлаждается внутри водоохлаждаемых кессонов — плоских коробов из листовой стали, по три кессона на проход. Проходы соединяются роликовыми коробками с плотно закрывающимися люками. Вода в кессоны подаётся тремя включёнными насосами; при понижении уровня воды в расширительном баке срабатывает звуковая и световая сигнализация.',
+      imgs: ['caissons', 'drivesCais', 'expTank', 'levelAlarm', 'breakAlarm'] },
+    { short: 'Обдувка', title: 'Установка струйной обдувки полосы',
+      facts: [['Ходов полосы', '2'], ['Высота', '~10 м'], ['Вентилятор', '50 000 Нм³/ч'], ['Полоса на выходе', '~60 °C']],
+      text: 'С обеих сторон полосы установлены металлические короба, в которые вентилятор подаёт холодный воздух из цеха; воздух выходит струями через отверстия и охлаждает полосу. Для бесперебойной работы предусмотрены два вентилятора — рабочий и резервный.',
+      imgs: [] },
+    { short: 'Затворы', title: 'Входной и выходной затворы',
+      facts: [['Тип', 'газодинамические'], ['Где', 'вход КН, выход КУО'], ['Задача', 'снизить потери газа']],
+      text: 'Затворы уменьшают потери защитного газа и не дают воздуху попасть в печь. Разуплотнение входного затвора приводит к перетоку увлажнённого газа в первый проход КН, выходного — к обратному перетоку в КУО и окислению полосы. Газоплотность затворов проверяют при каждом обходе. Регулировать полосу и устранять дефекты в затворах под газом запрещено.',
+      imgs: ['gateIn', 'fanIn', 'gateOut'] }
+];
+function renderTabs() {
+    document.getElementById('chamber-tabs').innerHTML =
+        CHAMBERS.map((c, i) => `<button class="tab-btn" onclick="showChamber(${i})">${c.short}</button>`).join('');
+    showChamber(0);
+}
+function showChamber(i) {
+    document.querySelectorAll('.tab-btn').forEach((b, j) => b.classList.toggle('active', i === j));
+    const c = CHAMBERS[i];
+    document.getElementById('chamber-panel').innerHTML = `
+        <h4>${c.title}</h4>
+        <div class="facts">${c.facts.map(f => `<div class="fact"><span>${f[0]}</span><strong>${f[1]}</strong></div>`).join('')}</div>
+        <p>${c.text}</p>
+        ${c.imgs.length ? `<div class="fig-row">${c.imgs.map(figHTML).join('')}</div>` : ''}`;
+}
+
+/* ================== СЛАЙДЕР БЫЛО/СТАЛО ================== */
+const VALVES = [
+    { id: '1АГ', x: 250, y: 70 }, { id: 'ОК1АГ', x: 420, y: 70 },
+    { id: '1А', x: 250, y: 170 }, { id: 'ОК1А', x: 420, y: 170 },
+    { id: '2В', x: 250, y: 280 }, { id: 'ПКН', x: 370, y: 280 }, { id: 'ОК1В', x: 480, y: 280 },
+    { id: '3В', x: 310, y: 238, v: true }, { id: '5В', x: 535, y: 238, v: true }
+];
+const LINES = [
+    { y: 70,  x0: 120, x1: 760, color: '#3b82f6', valves: ['1АГ', 'ОК1АГ'], src: ['Азот продувочный', '(газгольдер)'], dst: 'продувка печи' },
+    { y: 170, x0: 120, x1: 760, color: '#eab308', valves: ['1А', 'ОК1А'], src: ['АЗГ', '95% N₂ + 5% H₂'], dst: 'КН, КРО, КУО' },
+    { y: 280, x0: 120, x1: 590, color: '#ef4444', valves: ['2В', 'ПКН', 'ОК1В'], src: ['Водород', '(H₂)'], dst: '' }
+];
+const NORMAL = { '1АГ': 1, 'ОК1АГ': 0, '1А': 1, 'ОК1А': 1, '2В': 1, 'ПКН': 1, 'ОК1В': 1, '3В': 0, '5В': 0 };
+const SCENARIOS = [
+    { name: 'Работа → Аварийная продувка',
+      left:  { title: 'Нормальная работа', st: NORMAL },
+      right: { title: 'Аварийная продувка', st: { ...NORMAL, 'ОК1АГ': 1, 'ОК1А': 0, 'ОК1В': 0 } },
+      note: 'Аварийная отсечка водорода и АЗГ с продувкой печи продувочным азотом срабатывает автоматически: при падении давления в камерах ниже 2 мм вод. ст., содержании H₂ в камере ускоренного охлаждения более 9 %, падении давления сжатого воздуха (азота) на КИПиА, отключении напряжения, расходе АЗГ на КУО менее 600 м³/ч. Если ОК1АГ не открылся — срочно открыть задвижку байпаса 5АГ.' },
+    { name: 'Работа → Отсечка водорода',
+      left:  { title: 'Нормальная работа', st: NORMAL },
+      right: { title: 'Подача H₂ прекращена', st: { ...NORMAL, '2В': 0, 'ПКН': 0 } },
+      note: 'Применяется при работе печи с водородом. Ключ «УП» переводят в положение «Д» — клапан ПКН отсекает водород. Закрывают задвижки 2В и 4В (4В на схеме не показана). Затем ПКН открывают вручную подъёмом рычага и продувают газопровод водорода АЗГ в течение 30 минут, открыв вентили 5А и 12В, после чего продувают свечу С₃ (вентиль 5В). Подачу АЗГ не прекращают, пока содержание водорода в печи по газоанализаторам не станет не более 5 %.' },
+    { name: 'Работа → Остановка на ремонт',
+      left:  { title: 'Нормальная работа', st: NORMAL },
+      right: { title: 'Печь на ремонте', st: { '1АГ': 0, 'ОК1АГ': 0, '1А': 0, 'ОК1А': 0, '2В': 0, 'ПКН': 0, 'ОК1В': 0, '3В': 1, '5В': 1, '1АГ_p': 1, '1А_p': 1, '2В_p': 1 } },
+      note: 'По п.6.3 ПИ: прекратить подачу водорода, закрыть 2В, открыть вентили 3В и 5В свечей безопасности, установить заглушку после 2В. После освобождения печи от водорода прекратить подачу АЗГ (снижая расход по 300 м³/ч каждые 10 минут), закрыть всю запорную арматуру на газопроводах АЗГ и газгольдерного азота и установить заглушки после задвижек 1А и 1АГ. Заглушки ставят слесари УПГ по наряду-допуску.' }
+];
+
+function valveSVG(v, st) {
+    const open = !!st[v.id];
+    const fill = open ? '#22c55e' : '#ef4444';
+    const { x, y } = v;
+    const rot = v.v ? ` transform="rotate(90 ${x} ${y})"` : '';
+    let s = `<g${rot}><polygon points="${x-14},${y-11} ${x-14},${y+11} ${x},${y}" fill="${fill}" stroke="#0f172a" stroke-width="1.5"/>
+             <polygon points="${x+14},${y-11} ${x+14},${y+11} ${x},${y}" fill="${fill}" stroke="#0f172a" stroke-width="1.5"/></g>`;
+    if (v.v) {
+        s += `<text x="${x+28}" y="${y-2}" font-size="15" font-weight="700" fill="#0f172a">${v.id}</text>
+              <text x="${x+28}" y="${y+16}" font-size="12" font-weight="700" fill="${fill}">${open ? 'ОТКР' : 'ЗАКР'}</text>`;
+    } else {
+        s += `<text x="${x}" y="${y-19}" font-size="15" font-weight="700" fill="#0f172a" text-anchor="middle">${v.id}</text>
+              <text x="${x}" y="${y+30}" font-size="12" font-weight="700" fill="${fill}" text-anchor="middle">${open ? 'ОТКР' : 'ЗАКР'}</text>`;
+    }
+    if (st[v.id + '_p']) {
+        s += `<rect x="${x+24}" y="${y-16}" width="7" height="32" fill="#111827"/>
+              <text x="${x+28}" y="${y+46}" font-size="11" fill="#111827" text-anchor="middle">заглушка</text>`;
+    }
+    return s;
+}
+function pipe(x1, y1, x2, y2, color, flowing) {
+    if (!flowing) return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#cbd5e1" stroke-width="8" stroke-linecap="round"/>`;
+    return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-width="8" stroke-linecap="round"/>
+            <line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#fff" stroke-width="3" opacity=".7" class="flow"/>`;
+}
+function buildSchema(st, title) {
+    let s = `<svg viewBox="0 0 900 360" xmlns="http://www.w3.org/2000/svg">`;
+    s += `<text x="450" y="28" font-size="17" font-weight="700" fill="#334155" text-anchor="middle">${title}</text>`;
+    s += `<text x="450" y="352" font-size="12" fill="#94a3b8" text-anchor="middle">Упрощённая учебная схема. Не является технологической — см. Приложение А ИЭ/ПИ</text>`;
+    const vx = id => VALVES.find(v => v.id === id).x;
+    const lineFlow = {};
+    LINES.forEach((L, i) => {
+        const closed = L.valves.filter(id => !st[id]).map(vx);
+        const stopX = closed.length ? Math.min(...closed) : L.x1;
+        lineFlow[i] = !closed.length;
+        s += pipe(L.x0, L.y, stopX, L.y, L.color, true);
+        if (stopX < L.x1) s += pipe(stopX, L.y, L.x1, L.y, L.color, false);
+        s += `<text x="10" y="${L.y-4}" font-size="14" font-weight="700" fill="#0f172a">${L.src[0]}</text>
+              <text x="10" y="${L.y+14}" font-size="12" fill="#64748b">${L.src[1]}</text>`;
+        if (L.dst) s += `<text x="750" y="${L.y-10}" font-size="12" fill="#475569" text-anchor="end">→ ${L.dst}</text>`;
+    });
+    // АЗГ на увлажнитель (ответвление после ОК1А)
+    s += pipe(640, 170, 640, 250, '#eab308', lineFlow[1]);
+    // Увлажнитель и выход в КВ
+    const humidFlow = lineFlow[1] || lineFlow[2];
+    s += `<rect x="590" y="250" width="100" height="62" rx="10" fill="#bae6fd" stroke="#0369a1" stroke-width="2"/>
+          <text x="640" y="276" font-size="14" font-weight="700" fill="#0c4a6e" text-anchor="middle">УГ-1000</text>
+          <text x="640" y="294" font-size="11" fill="#0c4a6e" text-anchor="middle">увлажнитель</text>`;
+    s += pipe(690, 280, 760, 280, '#0ea5e9', humidFlow);
+    s += `<text x="750" y="270" font-size="12" fill="#475569" text-anchor="end">→ КВ</text>`;
+    // Свечи безопасности
+    [['3В', 310, 'C₂'], ['5В', 535, 'C₃']].forEach(([id, x, name]) => {
+        s += `<line x1="${x}" y1="280" x2="${x}" y2="205" stroke="#94a3b8" stroke-width="5"/>
+              <rect x="${x-10}" y="196" width="20" height="10" fill="#64748b"/>
+              <text x="${x}" y="190" font-size="12" font-weight="700" fill="#475569" text-anchor="middle">свеча ${name}</text>`;
+    });
+    // Печь
+    s += `<rect x="760" y="45" width="125" height="285" rx="8" fill="#f1f5f9" stroke="#475569" stroke-width="2"/>
+          <text x="822" y="185" font-size="15" font-weight="700" fill="#0f172a" text-anchor="middle">Башенная</text>
+          <text x="822" y="204" font-size="15" font-weight="700" fill="#0f172a" text-anchor="middle">печь АРО</text>`;
+    VALVES.forEach(v => s += valveSVG(v, st));
+    return s + `</svg>`;
+}
+let currentSc = 0;
+function renderScenarioButtons() {
+    document.getElementById('sc-btns').innerHTML =
+        SCENARIOS.map((sc, i) => `<button class="sc-btn${i === currentSc ? ' active' : ''}" onclick="setScenario(${i})">${sc.name}</button>`).join('');
+}
+function setScenario(i) {
+    currentSc = i;
+    const sc = SCENARIOS[i];
+    renderScenarioButtons();
+    document.getElementById('ba-left').innerHTML = buildSchema(sc.left.st, sc.left.title);
+    document.getElementById('ba-right').innerHTML = buildSchema(sc.right.st, sc.right.title);
+    document.getElementById('ba-l').textContent = 'Было: ' + sc.left.title;
+    document.getElementById('ba-r').textContent = 'Стало: ' + sc.right.title;
+    document.getElementById('sc-note').innerHTML = sc.note;
+    const word = o => o ? '<span class="st-open">открыт</span>' : '<span class="st-closed">закрыт</span>';
+    const diffs = VALVES.filter(v => !!sc.left.st[v.id] !== !!sc.right.st[v.id] || !!sc.left.st[v.id + '_p'] !== !!sc.right.st[v.id + '_p'])
+        .map(v => `<div><strong>${v.id}:</strong> ${word(sc.left.st[v.id])} → ${word(sc.right.st[v.id])}${sc.right.st[v.id + '_p'] ? ' + заглушка' : ''}</div>`);
+    document.getElementById('sc-diff').innerHTML = '<strong>Что изменилось:</strong>' + diffs.join('');
+    setSlider(50);
+}
+function setSlider(pos) {
+    document.getElementById('ba-range').value = pos;
+    document.getElementById('ba-right').style.clipPath = `inset(0 0 0 ${pos}%)`;
+    document.getElementById('ba-handle').style.left = pos + '%';
+}
+
+/* ================== МАРШРУТ ОБХОДА ================== */
+const ROUTE = [
+    { title: 'Тепловой щит', x: 6, y: 91, imgs: ['panel', 'screen'],
+      intro: 'Перед выходом на печь оцените газовый режим по приборам теплового щита — так вы будете знать, на что обратить внимание при осмотре.',
+      checks: ['Давление на поду печи — не менее 1,5 мм вод. ст.',
+               'Общий расход АЗГ 1200–1700 м³/ч; по камерам: КН 0–100, КВ 200–400, КУО 1000–1200 м³/ч',
+               'H₂ в АЗГ 5,0–5,5 %, в камерах 5,0–8,0 %; O₂ в КН и КУО — не более 0,2 %',
+               'Сигнализатор СВК не показывает превышения H₂ в воздухе (0,8 %)',
+               'Давление азота или сжатого воздуха на питание КИПиА — не ниже 2,0 кгс/см²'] },
+    { title: 'Разводка трубопроводов АЗГ', x: 25, y: 92, imgs: ['pipes', 'azgFurn', 'azgN2'],
+      intro: 'Осмотрите газопроводы и запорно-регулирующую арматуру на подводе защитного газа к печи.',
+      checks: ['Трубопроводы и арматура АЗГ без видимых утечек газа',
+               'Подозрительные места проверены только мыльным раствором',
+               'Основная подающая задвижка 1А открыта',
+               'Арматура переключается легко, нет заклиниваний и подтёков у клапанов'] },
+    { title: 'Увлажнитель газа (скруббер)', x: 49.5, y: 89, imgs: ['scrubber', 'waterScrub', 'azgScrub'],
+      intro: 'От работы скруббера зависит влажность газа в камере выдержки, а значит — обезуглероживание полосы.',
+      checks: ['Вода в скруббере есть, подача воды ХВ-1 в норме',
+               'Насос скруббера работает, пальцы полумуфт целы; при неисправности — переход на резервный насос',
+               'Температура воды в увлажнителе 35–55 °C',
+               'Температура увлажнённого АЗГ после газоподогревателя — около 50 °C'] },
+    { title: 'Индукционная установка', x: 14.5, y: 66, imgs: ['pyro', 'indMonitor', 'azgInd'],
+      intro: 'Индуктор нагревает полосу до 900 °C. Помните: ультразвук и электромагнитное поле — работать только с берушами или антифонами.',
+      checks: ['Охлаждение водой катушек, ярм и концентраторов в норме',
+               'Показания пирометра и монитора параметров индуктора в норме',
+               'Подача АЗГ в индуктор открыта',
+               'Не находиться на индукторе и под ним во время работы'] },
+    { title: 'Входной затвор', x: 20.5, y: 81, imgs: ['gateIn', 'fanIn'],
+      intro: 'Разуплотнение входного затвора приводит к перетоку влажного газа в первый проход КН и окислению полосы.',
+      checks: ['Газоплотность входного затвора проверена',
+               'Полоса на входе осмотрена с обеих сторон: нет царапин, надавов, окисления',
+               'Центровка полосы на входе в норме',
+               'Вентилятор работает без посторонних звуков (скрип, скрежет, гул)'] },
+    { title: 'Печные ролики, люки и тамбуры', x: 30, y: 14, imgs: ['drives', 'rollWater', 'rolls'],
+      intro: 'Пройдите по ярусам площадок вдоль камер нагрева и выдержки.',
+      checks: ['Защитные кожухи на приводах печных роликов на месте и закреплены',
+               'Сильфоны роликов целы; порывы уплотнены каолиновой ватой',
+               'Уплотнение роликовых окон, нижних люков, ложных окон и дверей тамбуров в норме',
+               'Цапфы роликов надёжно охлаждаются водой, проливов воды нет'] },
+    { title: 'Технологические свечи', x: 44, y: 5.5, imgs: ['tower', 'azgValve'],
+      intro: 'Через свечу в конце КН сбрасывается отработанный газ, насыщенный CO. От неё зависит давление в печи.',
+      checks: ['Свечи в исправном состоянии, видимых утечек газа нет',
+               'Регулирующий орган свечи открыт примерно на 20 % (минимум 10 %) — сверено с тепловым щитом',
+               'Уплотнение верхних люков и лючков всех камер в норме'] },
+    { title: 'Кессоны камеры ускоренного охлаждения', x: 78, y: 45, imgs: ['caissons', 'drivesCais', 'expTank', 'levelAlarm', 'breakAlarm'],
+      intro: 'Прогар кессона — опасный дефект: вода попадает в защитную атмосферу или на горячую полосу.',
+      checks: ['Сварные соединения кессонов с роликовыми коробками без дефектов',
+               'Соединение термосифона с переходным тамбуром КУО плотное',
+               'Уровень воды в расширительном баке в норме, сигнализация уровня исправна',
+               'Вода в кессоны подаётся тремя включёнными насосами'] },
+    { title: 'Выходной затвор', x: 86.2, y: 81, imgs: ['gateOut', 'transport'],
+      intro: 'Финальная точка: качество полосы на выходе показывает, всё ли в порядке с газовым режимом.',
+      checks: ['Газоплотность выходного затвора проверена',
+               'Полоса на выходе осмотрена с обеих сторон: нет царапин, надавов, окисления',
+               'Центровка полосы на выходе в норме',
+               'Знаю действия при выходе окисленного металла: проверить давление на поду, H₂ и влажность в камерах'] }
+];
+let routeStep = 0, routeErrors = 0;
+
+function buildFurnaceSVG() {
+    let s = `<svg viewBox="0 0 1000 560" xmlns="http://www.w3.org/2000/svg">`;
+    s += `<rect x="0" y="470" width="1000" height="90" fill="#eef2f7"/><line x1="0" y1="470" x2="1000" y2="470" stroke="#cbd5e1" stroke-width="2"/>`;
+    for (let i = 1; i <= 6; i++) { const y = 60 + i * 55; s += `<line x1="185" y1="${y}" x2="880" y2="${y}" stroke="#e2e8f0" stroke-dasharray="4 6"/>`; }
+    const ch = [{ x: 200, w: 230, t: 'КН', c: '#fee2e2' }, { x: 430, w: 210, t: 'КВ', c: '#ffedd5' }, { x: 640, w: 60, t: 'КРО', c: '#fef9c3' }, { x: 700, w: 160, t: 'КУО', c: '#dbeafe' }];
+    ch.forEach(c => {
+        s += `<rect x="${c.x}" y="60" width="${c.w}" height="380" fill="${c.c}" stroke="#475569" stroke-width="2"/>
+              <text x="${c.x + c.w / 2}" y="460" font-size="16" font-weight="700" fill="#334155" text-anchor="middle">${c.t}</text>`;
+    });
+    s += `<rect x="895" y="250" width="50" height="190" fill="#e0f2fe" stroke="#475569" stroke-width="2"/>
+          <text x="920" y="240" font-size="13" font-weight="600" fill="#334155" text-anchor="middle">обдувка</text>`;
+    // Полоса
+    const passes = (x0, w, n, top) => Array.from({ length: n }, (_, i) => ({ x: x0 + w * (i + 0.5) / n, top }));
+    const P = [...passes(200, 230, 6, 80), ...passes(430, 210, 9, 80), ...passes(640, 60, 3, 80), ...passes(700, 160, 8, 80), ...passes(895, 50, 2, 265)];
+    const pts = [[20, 420]];
+    P.forEach((p, i) => { if (i % 2 === 0) { pts.push([p.x, 420], [p.x, p.top]); } else { pts.push([p.x, p.top], [p.x, 420]); } });
+    pts.push([1000, 420]);
+    s += `<polyline points="${pts.map(p => p.join(',')).join(' ')}" fill="none" stroke="#64748b" stroke-width="2.5"/>`;
+    pts.slice(1, -1).forEach(p => s += `<circle cx="${p[0]}" cy="${p[1]}" r="5" fill="#fff" stroke="#334155" stroke-width="1.5"/>`);
+    // Индуктор, затворы
+    s += `<rect x="105" y="400" width="80" height="40" rx="4" fill="#c7d2fe" stroke="#4338ca" stroke-width="2"/>
+          <text x="145" y="392" font-size="13" font-weight="600" fill="#334155" text-anchor="middle">индуктор</text>
+          <rect x="193" y="403" width="12" height="34" fill="#0f172a"/>
+          <rect x="856" y="403" width="12" height="34" fill="#0f172a"/>`;
+    // Свеча
+    s += `<line x1="415" y1="60" x2="415" y2="18" stroke="#64748b" stroke-width="6"/><rect x="405" y="10" width="20" height="10" fill="#334155"/>
+          <text x="470" y="58" font-size="12" fill="#475569">техн. свеча</text>`;
+    // Газопровод АЗГ и скруббер
+    s += `<line x1="100" y1="515" x2="860" y2="515" stroke="#eab308" stroke-width="7"/>
+          <line x1="300" y1="515" x2="300" y2="440" stroke="#eab308" stroke-width="5"/>
+          <line x1="780" y1="515" x2="780" y2="440" stroke="#eab308" stroke-width="5"/>
+          <line x1="495" y1="482" x2="495" y2="440" stroke="#0ea5e9" stroke-width="5"/>
+          <rect x="470" y="482" width="50" height="68" rx="10" fill="#bae6fd" stroke="#0369a1" stroke-width="2"/>
+          <text x="560" y="540" font-size="13" font-weight="600" fill="#334155">УГ-1000</text>
+          <text x="140" y="508" font-size="12" fill="#854d0e">АЗГ</text>`;
+    // Тепловой щит
+    s += `<rect x="20" y="478" width="80" height="64" rx="4" fill="#e2e8f0" stroke="#475569" stroke-width="2"/>`;
+    for (let r = 0; r < 2; r++) for (let c = 0; c < 3; c++) s += `<rect x="${30 + c * 22}" y="${488 + r * 24}" width="16" height="16" fill="#94a3b8"/>`;
+    return s + `</svg>`;
+}
+function renderRoute() {
+    const map = document.getElementById('route-map');
+    if (!map.querySelector('svg')) map.innerHTML = buildFurnaceSVG();
+    map.querySelectorAll('.hotspot').forEach(h => h.remove());
+    ROUTE.forEach((p, i) => {
+        const b = document.createElement('button');
+        b.className = 'hotspot' + (i < routeStep ? ' done' : '');
+        b.style.left = p.x + '%'; b.style.top = p.y + '%';
+        b.textContent = i < routeStep ? '✓' : '?';
+        b.setAttribute('aria-label', i < routeStep ? p.title : 'Узел печи');
+        b.dataset.idx = i;
+        b.onclick = () => clickHotspot(i, b);
+        map.appendChild(b);
+    });
+    const done = routeStep >= ROUTE.length;
+    document.getElementById('route-task').innerHTML = done
+        ? '✅ Обход завершён'
+        : `Найдите на схеме и проверьте: <b>${ROUTE[routeStep].title}</b>`;
+    document.getElementById('route-meta').textContent = `Проверено ${Math.min(routeStep, ROUTE.length)} из ${ROUTE.length} · ошибок маршрута: ${routeErrors}`;
+    document.getElementById('route-bar').style.width = (Math.min(routeStep, ROUTE.length) / ROUTE.length * 100) + '%';
+    document.getElementById('route-success').style.display = done ? 'block' : 'none';
+    document.getElementById('quiz-lock').style.display = done ? 'none' : 'block';
+    document.getElementById('quiz-wrap').style.display = done ? 'block' : 'none';
+    checkCompletion();
+}
+function clickHotspot(i, btn) {
+    if (i < routeStep) { openPanel(i, true); return; }
+    if (i === routeStep) { openPanel(i, false); return; }
+    routeErrors++;
+    store.set('module2_route_errors', routeErrors);
+    btn.classList.add('shake');
+    setTimeout(() => btn.classList.remove('shake'), 450);
+    toast(`Это «${ROUTE[i].title}». По маршруту сейчас нужно проверить: «${ROUTE[routeStep].title}»`);
+    renderRoute();
+}
+function openPanel(i, review) {
+    const p = ROUTE[i];
+    const panel = document.getElementById('route-panel');
+    panel.innerHTML = `
+        <span class="rp-num">Точка ${i + 1} из ${ROUTE.length}</span>
+        <h4>${p.title}</h4>
+        <p>${p.intro}</p>
+        <div class="fig-row">${p.imgs.map(figHTML).join('')}</div>
+        <div class="checks">${p.checks.map(c => `
+            <label class="check-item"><input type="checkbox" ${review ? 'checked disabled' : ''} onchange="updateConfirm()"><span>${c}</span></label>`).join('')}
+        </div>
+        ${review ? '<div class="done-note">✓ Узел проверен</div>'
+                 : '<button class="confirm-btn" id="confirm-btn" disabled onclick="confirmStep()">Узел проверен — идти дальше ➔</button>'}`;
+    panel.style.display = 'block';
+    panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+function updateConfirm() {
+    const boxes = [...document.querySelectorAll('#route-panel input[type=checkbox]')];
+    const btn = document.getElementById('confirm-btn');
+    if (btn) btn.disabled = !boxes.every(b => b.checked);
+}
+function confirmStep() {
+    routeStep++;
+    store.set('module2_route_step', routeStep);
+    document.getElementById('route-panel').style.display = 'none';
+    renderRoute();
+    document.getElementById('route-map').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    if (routeStep < ROUTE.length) toast(`Отлично! Следующая точка: «${ROUTE[routeStep].title}»`);
+}
+function showHint() {
+    if (routeStep >= ROUTE.length) return;
+    const h = document.querySelector(`.hotspot[data-idx="${routeStep}"]`);
+    if (h) { h.classList.remove('hint'); void h.offsetWidth; h.classList.add('hint'); }
+}
+function resetRoute() {
+    routeStep = 0; routeErrors = 0;
+    store.del('module2_route_step'); store.del('module2_route_errors');
+    document.getElementById('route-panel').style.display = 'none';
+    resetQuiz();
+    renderRoute();
+}
+
+/* ================== ТЕСТ ================== */
+const QUIZ = [
+    { q: 'Какой газ подают в камеру выдержки?',
+      o: ['Сухой АЗГ с точкой росы −40 °C', 'Увлажнённый АЗГ через увлажнитель УГ-1000', 'Чистый продувочный азот', 'Природный газ'], a: 1,
+      e: 'В КН, КРО и КУО — сухой АЗГ (точка росы −40 °C), а в камеру выдержки — увлажнённый АЗГ (точка росы около +60 °C) через УГ-1000.' },
+    { q: 'Какое давление поддерживается в печи, чтобы исключить подсос воздуха?',
+      o: ['0,3–0,5 мм вод. ст.', '1,5–10 мм вод. ст. на уровне нижних роликов', '50–100 мм вод. ст.', '500 мм вод. ст.'], a: 1,
+      e: 'В печи поддерживается положительное давление 1,5–10 мм вод. ст. на уровне нижних роликов.' },
+    { q: 'Что происходит с отсечными клапанами при срабатывании аварийной продувки?',
+      o: ['Все клапаны закрываются', 'ОК1АГ закрывается, ОК1А и ОК1В открываются', 'ОК1АГ открывается, ОК1А и ОК1В закрываются', 'Клапаны не меняют положения'], a: 2,
+      e: 'Открывается ОК1АГ на линии продувочного азота, а ОК1А (АЗГ) и ОК1В (водород) закрываются. Если ОК1АГ не открылся — открыть байпас 5АГ.' },
+    { q: 'Чем проверяют утечки газа на газопроводах и арматуре?',
+      o: ['Открытым пламенем', 'Только мыльным раствором', 'На слух, без дополнительных средств', 'Достаточно запаха'], a: 1,
+      e: 'Утечки проверяют только мыльным раствором. Проверка открытым огнём и использование факела запрещены.' },
+    { q: 'Какой должна быть степень открытия регулирующего органа технологической свечи при нормальной работе печи?',
+      o: ['100 %', '50 %', '20 %', '0 % — свеча всегда закрыта'], a: 2,
+      e: 'При нормальной работе — 20 %, минимальная степень открытия — 10 %.' }
+];
+function renderQuiz() {
+    document.getElementById('quiz').innerHTML = QUIZ.map((item, i) => `
+        <div class="q-card" id="q${i}">
+            <div class="q-title">${i + 1}. ${item.q}</div>
+            ${item.o.map((o, j) => `<label class="q-opt"><input type="radio" name="q${i}" value="${j}"><span>${o}</span></label>`).join('')}
+            <div class="q-exp">${item.e}</div>
+        </div>`).join('');
+}
+function checkQuiz() {
+    let ok = 0;
+    QUIZ.forEach((item, i) => {
+        const sel = document.querySelector(`input[name="q${i}"]:checked`);
+        const card = document.getElementById('q' + i);
+        card.classList.remove('ok', 'bad');
+        if (sel && +sel.value === item.a) { card.classList.add('ok'); ok++; } else card.classList.add('bad');
+    });
+    const res = document.getElementById('quiz-result');
+    if (ok === QUIZ.length) {
+        store.set('module2_quiz_passed', 'true');
+        res.style.color = '#059669';
+        res.textContent = `Все ответы верны (${ok} из ${QUIZ.length})!`;
+        document.querySelectorAll('#quiz input').forEach(inp => inp.disabled = true);
+        document.getElementById('quiz-check').style.display = 'none';
+    } else {
+        res.style.color = '#dc2626';
+        res.textContent = `Верно ${ok} из ${QUIZ.length}. Исправьте ошибки и проверьте ещё раз.`;
+    }
+    checkCompletion();
+}
+function restoreQuiz() {
+    if (store.get('module2_quiz_passed') !== 'true') return;
+    QUIZ.forEach((item, i) => {
+        const r = document.querySelector(`input[name="q${i}"][value="${item.a}"]`);
+        if (r) r.checked = true;
+        document.getElementById('q' + i).classList.add('ok');
+    });
+    document.querySelectorAll('#quiz input').forEach(inp => inp.disabled = true);
+    document.getElementById('quiz-check').style.display = 'none';
+    document.getElementById('quiz-result').textContent = 'Тест пройден ✓';
+    document.getElementById('quiz-result').style.color = '#059669';
+}
+function resetQuiz() {
+    store.del('module2_quiz_passed');
+    renderQuiz();
+    document.getElementById('quiz-check').style.display = 'block';
+    document.getElementById('quiz-result').textContent = '';
+}
+
+/* ================== ЗАВЕРШЕНИЕ ================== */
+function checkCompletion() {
+    const done = routeStep >= ROUTE.length && store.get('module2_quiz_passed') === 'true';
+    document.getElementById('disabled-msg').style.display = done ? 'none' : 'block';
+    document.getElementById('next-module-btn').style.display = done ? 'block' : 'none';
+    document.getElementById('reset-btn').style.display = done ? 'block' : 'none';
+}
+function goNext() {
+    if (window.parent && window.parent !== window) {
+        window.parent.postMessage({ action: 'completeModule', moduleId: 2, next: 'module3.html' }, '*');
+    } else {
+        window.location.href = 'module3.html';
+    }
+}
+function resetModule() {
+    resetRoute();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ================== ЗАПУСК ================== */
+window.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.fig-row[data-imgs]').forEach(row => {
+        row.innerHTML = row.dataset.imgs.split('|').map(figHTML).join('');
+    });
+    renderTabs();
+    setScenario(0);
+    document.getElementById('ba-range').addEventListener('input', e => setSlider(e.target.value));
+    routeStep = parseInt(store.get('module2_route_step') || '0', 10) || 0;
+    routeErrors = parseInt(store.get('module2_route_errors') || '0', 10) || 0;
+    renderQuiz();
+    restoreQuiz();
+    renderRoute();
+});
+</script>
+</body>
+</html>
