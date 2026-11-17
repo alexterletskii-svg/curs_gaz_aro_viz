@@ -198,9 +198,23 @@
             { id: 1, title: "Модуль 1. Природа газов и защитные атмосферы", completed: false, file: "module1.html" },
             { id: 2, title: "Модуль 2. Газовое оборудование и обход печи", completed: false, file: "module2.html" },
             { id: 3, title: "Модуль 3. Контрольно-измерительные приборы", completed: false, file: "module3.html" },
-            { id: 3, title: "Модуль 4. Безопасность и нештатные ситуации", completed: false, file: "module4.html" },
-            { id: 4, title: "Итоговый тест", completed: false, file: "test.html" }
+            { id: 4, title: "Модуль 4. Безопасность и нештатные ситуации", completed: false, file: "module4.html" },
+            { id: 5, title: "Итоговый тест", completed: false, file: "test.html" }
         ];
+
+        // Прогресс хранится в браузере, чтобы не сбрасываться при перезагрузке страницы
+        const PROGRESS_KEY = 'curs_aro_completed';
+        function loadProgress() {
+            try {
+                const done = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+                courseData.forEach(m => { m.completed = done.includes(m.id); });
+            } catch (e) {}
+        }
+        function saveProgress() {
+            try {
+                localStorage.setItem(PROGRESS_KEY, JSON.stringify(courseData.filter(m => m.completed).map(m => m.id)));
+            } catch (e) {}
+        }
 
         function renderTOC() {
             const mainToc = document.getElementById('main-toc');
@@ -267,15 +281,18 @@
 
         // Слушатель сообщений от дочерних страниц (из iframe)
         window.addEventListener('message', function(event) {
+            if (event.source !== document.getElementById('course-frame').contentWindow) return;
             if (event.data && event.data.action === 'completeModule') {
                 const mod = courseData.find(m => m.id === event.data.moduleId);
                 if (mod) mod.completed = true;
+                saveProgress();
                 renderTOC(); // Обновляем галочки и проценты
-                showHome();  // Возвращаем пользователя в меню
+                if (event.data.next) loadModule(event.data.next); // К следующему модулю
+                else showHome();                                   // Курс завершён — в меню
             }
         });
 
-        window.onload = renderTOC;
+        window.onload = () => { loadProgress(); renderTOC(); };
     </script>
 </body>
 </html>
