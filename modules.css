@@ -1,0 +1,97 @@
+/* Общее оформление страниц курса (модули 1–4 и тест). Подключается после встроенных стилей. */
+body { background: var(--paper); padding: 0; color: var(--ink); font-size: 17px; line-height: 1.65; }
+.lesson-container, .container, .test-container { max-width: 920px; margin: 0 auto; background: #fff; padding: 0 48px 64px; border-radius: 0; box-shadow: none; border-left: 1px solid var(--line); border-right: 1px solid var(--line); min-height: 100vh; }
+
+/* Шапка модуля: синяя плашка и полоса-акцент */
+.lesson-container > h2:first-child { margin: 0 -48px 40px; padding: 44px 48px 34px; background: var(--navy); color: #fff; border: 0; border-bottom: 5px solid var(--heat); font-size: 2.5rem; line-height: 1.1; font-weight: 700; }
+.lesson-container > h2:first-child::before { content: attr(data-mod); display: block; font-family: var(--body); font-size: 0.95rem; font-weight: 500; color: var(--heat-soft); margin-bottom: 10px; }
+
+h3 { color: var(--navy); font-size: 1.75rem; font-weight: 700; margin: 56px 0 18px; padding-top: 26px; border-top: 1px solid var(--line); line-height: 1.15; }
+h2 + p + .alert-dark + h3, .lesson-container > h3:first-of-type { border-top: 0; padding-top: 0; }
+h4 { color: var(--navy); font-size: 1.3rem; font-weight: 600; margin: 28px 0 10px; }
+p, li { color: var(--ink); font-size: 1rem; text-align: left; }
+p { max-width: 70ch; }
+ul, ol { max-width: 70ch; }
+strong { color: var(--ink); font-weight: 600; }
+
+/* Плашки */
+.alert-dark { background: var(--navy); border-left: 5px solid var(--heat); border-radius: 4px; margin: 28px 0; padding: 18px 22px; box-shadow: none; }
+.alert-dark .alert-icon { position: static; transform: none; width: 26px; height: 26px; border-radius: 4px; background: var(--heat); color: #fff; margin-bottom: 10px; font-family: var(--head); }
+.alert-dark strong { color: var(--heat-soft); font-family: var(--head); font-size: 1.15rem; font-weight: 600; margin-bottom: 6px; }
+.alert-light { background: var(--panel); border-left: 5px solid var(--navy); border-radius: 0 4px 4px 0; color: var(--ink); }
+.alert-danger { border-radius: 0 4px 4px 0; border-left-width: 5px; }
+.alert-warn { border-radius: 0 4px 4px 0; border-left-width: 5px; }
+
+/* Цифры */
+.stats-grid { gap: 12px; }
+.stat-box { background: #fff; border: 1px solid var(--line); border-top: 4px solid var(--navy); border-radius: 4px; text-align: left; padding: 14px 16px 16px; }
+.stat-box b { font-family: var(--head); font-size: 2.1rem; font-weight: 700; color: var(--navy); }
+.stat-box span { color: var(--ink-2); font-size: 0.9rem; }
+
+/* Фото */
+.fig img { border-radius: 4px; border-color: var(--line); }
+.fig img:hover { transform: none; }
+.fig figcaption { text-align: left; color: var(--ink-2); }
+.fig .ph { border-radius: 4px; }
+
+/* Узлы, арматура, вкладки */
+.tab-btn { border-radius: 4px 4px 0 0; background: var(--panel); border-color: var(--line); color: var(--ink); }
+.tab-btn.active { background: var(--navy); border-color: var(--navy); color: #fff; }
+.tab-panel { border-radius: 0 4px 4px 4px; border-color: var(--line); }
+.fact { background: var(--panel); border-left: 3px solid var(--heat); border-radius: 0 4px 4px 0; }
+.fact span { text-transform: none; font-size: 0.82rem; letter-spacing: 0; color: var(--ink-2); font-weight: 500; }
+.arm-list details, .acc details { border-color: var(--line); border-radius: 4px; }
+.arm-list summary::after, .acc summary::after { color: var(--heat); }
+.arm-tag { border-radius: 4px; background: var(--navy); }
+
+/* Единые скругления и рамки у карточек */
+.phone, .scen-card, .post, .instr-card, .sim-box, .route-box, .q-card, .dnd-container, .chart-box, .stat-box, .sim-msg, .review, .ppe div, .five div, .steps li, .trig-btn, .chip, .drag-item, .drop-zone, .disabled-text, .reset-btn, .q-opt, .auto-detail, .table-wrap { border-radius: 4px; }
+.chip { border-color: var(--line); }
+.chip.active, .tab-btn.active { background: var(--navy); border-color: var(--navy); }
+.instr-card, .post, .phone, .scen-card, .sim-box, .route-box { border-color: var(--line); }
+.steps li::before { border-radius: 4px; background: var(--navy); font-family: var(--head); }
+table.alarm th, table.t th { background: var(--navy); font-family: var(--head); font-weight: 600; letter-spacing: 0; }
+
+/* Кнопки */
+.check-btn, .confirm-btn, .small-btn, .next-btn, .res-btn { background: var(--navy); border-radius: 4px; font-weight: 600; }
+.check-btn:hover, .confirm-btn:hover, .next-btn:hover, .res-btn:hover { background: var(--navy-2); }
+.nav-btn { background: var(--navy); border-bottom: 4px solid var(--heat); border-radius: 4px; text-transform: none; font-size: 1.1rem; font-weight: 600; padding: 18px 28px; }
+.nav-btn:hover { background: var(--navy-2); }
+.reset-btn { border-color: var(--line); color: var(--ink-2); }
+.disabled-text { background: var(--panel); color: var(--ink-2); font-size: 0.95rem; border: 1px dashed var(--line); }
+
+/* Тесты */
+.q-card { border-color: var(--line); }
+.q-opt:hover { background: var(--panel); }
+.q-opt input { accent-color: var(--navy); }
+
+/* Модуль 1: четыре карточки газов в один ряд, без «сироты» */
+.gas-grid { grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.gas-card { height: 300px; }
+.gas-card-front, .gas-card-back { border-radius: 4px; box-shadow: none; }
+.gas-card-front { border: 1px solid var(--line); border-top: 5px solid var(--navy); }
+.gas-card:nth-child(1) .gas-card-front { border-top-color: #ef4444; }
+.gas-card:nth-child(2) .gas-card-front { border-top-color: #3b82f6; }
+.gas-card:nth-child(4) .gas-card-front { border-top-color: #0ea5e9; }
+.gas-card-front .formula { font-family: var(--head); font-size: 3.2rem; color: var(--navy); }
+.gas-card-front h4 { margin: 0 0 6px; }
+.flip-hint { color: var(--ink-2) !important; font-weight: 500 !important; }
+.gas-card-back { background: var(--navy); border-left: 0; border-top: 5px solid var(--heat); }
+.card-stat-label { text-transform: none !important; letter-spacing: 0 !important; font-size: 0.82rem !important; color: #9fb3c8 !important; }
+.drop-zone-title { text-transform: none !important; letter-spacing: 0; }
+.drop-zone.correct .drop-zone-title { text-transform: none; }
+@media (max-width: 900px) { .gas-grid { grid-template-columns: repeat(2, 1fr); } }
+
+/* Полоса чтения — единственный «акцент движения»: заполняется при прокрутке */
+.read-strip { position: fixed; top: 0; left: 0; right: 0; height: 4px; background: rgba(2,33,63,.15); z-index: 500; }
+.read-strip i { display: block; height: 100%; width: 0; background: var(--heat); }
+
+@media (max-width: 700px) {
+  .lesson-container, .container, .test-container { padding: 0 20px 48px; border: 0; }
+  .lesson-container > h2:first-child { margin: 0 -20px 28px; padding: 32px 20px 26px; font-size: 1.9rem; }
+  h3 { font-size: 1.45rem; }
+  .gas-card { height: 280px; }
+}
+.scen-grid .scen-card:last-child:nth-child(odd) { grid-column: 1 / -1; }
+.q-topic, .rp-num, .auto-detail h5 { text-transform: none; letter-spacing: 0; font-size: 0.9rem; }
+.rp-num { color: var(--heat); }

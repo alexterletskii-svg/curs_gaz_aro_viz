@@ -35,14 +35,14 @@
         /* Посты */
         .posts { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 20px 0; }
         .post { border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; background: #f8fafc; }
-        .post h4 { margin-bottom: 8px; font-size: 1.05rem; color: #0056b3; }
+        .post h4 { margin-bottom: 8px; font-size: 1.05rem; color: #02213F; }
         .post ul { margin: 0; padding-left: 18px; }
         .post li { font-size: 0.95rem; margin-bottom: 4px; }
 
         /* Справочник КИП */
         .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
         .chip { background: #fff; border: 1px solid #cbd5e1; padding: 7px 14px; border-radius: 20px; cursor: pointer; font-size: 0.9rem; color: #334155; transition: .2s; }
-        .chip.active { background: #0056b3; color: #fff; border-color: #0056b3; }
+        .chip.active { background: #02213F; color: #fff; border-color: #02213F; }
         .instr-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
         .instr-card { border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; background: #fff; border-top: 4px solid #3b82f6; }
         .instr-card[data-cat="flow"] { border-top-color: #eab308; }
@@ -51,7 +51,7 @@
         .instr-card[data-cat="temp"] { border-top-color: #0ea5e9; }
         .instr-card[data-cat="other"] { border-top-color: #94a3b8; }
         .instr-card h5 { font-size: 1rem; color: #0f172a; margin-bottom: 4px; }
-        .instr-dev { font-size: 0.85rem; color: #0056b3; font-weight: 600; margin-bottom: 10px; }
+        .instr-dev { font-size: 0.85rem; color: #02213F; font-weight: 600; margin-bottom: 10px; }
         .instr-row { display: flex; justify-content: space-between; gap: 10px; font-size: 0.88rem; padding: 4px 0; border-bottom: 1px dashed #e2e8f0; }
         .instr-row:last-child { border-bottom: none; }
         .instr-row span { color: #64748b; }
@@ -120,7 +120,7 @@
         .sim-tools { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
         .small-btn { background: #fff; border: 1px solid #cbd5e1; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 0.9rem; color: #334155; }
         .small-btn:hover { background: #f1f5f9; }
-        .next-btn { background: #0056b3; color: #fff; border: none; padding: 12px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: 12px; }
+        .next-btn { background: #02213F; color: #fff; border: none; padding: 12px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: 12px; }
         .score-dots { display: flex; gap: 6px; flex-wrap: wrap; }
         .score-dots i { width: 14px; height: 14px; border-radius: 50%; background: #475569; display: inline-block; }
         .score-dots i.ok { background: #22c55e; }
@@ -135,14 +135,14 @@
         .q-title { font-weight: 600; margin-bottom: 12px; color: #0f172a; }
         .q-opt { display: flex; gap: 10px; align-items: flex-start; padding: 8px 12px; border-radius: 8px; cursor: pointer; }
         .q-opt:hover { background: #f1f5f9; }
-        .q-opt input { margin-top: 6px; accent-color: #0056b3; }
+        .q-opt input { margin-top: 6px; accent-color: #02213F; }
         .q-exp { display: none; margin-top: 10px; font-size: 0.95rem; color: #334155; }
         .q-card.ok .q-exp, .q-card.bad .q-exp { display: block; }
         .quiz-result { font-weight: 600; margin-top: 8px; }
 
         /* Кнопки завершения */
         .btn-group { display: flex; flex-direction: column; gap: 12px; margin-top: 32px; }
-        .check-btn { background: #0056b3; color: #fff; border: none; padding: 14px 24px; font-size: 1rem; font-weight: 600; border-radius: 8px; cursor: pointer; }
+        .check-btn { background: #02213F; color: #fff; border: none; padding: 14px 24px; font-size: 1rem; font-weight: 600; border-radius: 8px; cursor: pointer; }
         .nav-btn { background: #10b981; color: white; border: none; padding: 18px 32px; font-size: 1.1rem; font-weight: bold; border-radius: 8px; cursor: pointer; width: 100%; text-transform: uppercase; display: none; }
         .nav-btn:hover { background: #059669; }
         .reset-btn { background: transparent; color: #64748b; border: 1px solid #cbd5e1; padding: 12px 24px; font-size: 1rem; border-radius: 8px; cursor: pointer; width: 100%; display: none; }
@@ -165,6 +165,9 @@
             .sim-box { padding: 14px; }
         }
     </style>
+    <link rel="stylesheet" href="theme.css">
+    <link rel="stylesheet" href="modules.css">
+    <script src="theme.js" defer></script>
 </head>
 <body>
 <div class="lesson-container">
